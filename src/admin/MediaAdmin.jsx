@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useGitHubData } from '../hooks/useGitHubData';
 import { writeGitHubData } from '../hooks/useGitHubWrite';
 import { Link } from 'react-router-dom';
+import ImageUploader from '../components/shared/ImageUploader';
 
 export default function MediaAdmin() {
   const { data, loading, error: fetchError, refetch } = useGitHubData('media.json');
@@ -200,14 +201,17 @@ export default function MediaAdmin() {
                 </div>
                 
                 <div className="flex-1 space-y-4">
-                  <div>
-                    <label className="block font-mono text-[11px] text-[#8fa3c0] mb-1">Image URL</label>
+                  <div className="space-y-2">
+                    <label className="block font-mono text-[11px] text-[#8fa3c0] mb-1">Gallery Image</label>
+                    <ImageUploader 
+                      onUploadSuccess={(url) => updateItem(item.id, 'url', url)}
+                    />
                     <input 
                       type="text" 
                       value={item.url} 
                       onChange={(e) => updateItem(item.id, 'url', e.target.value)}
                       className="w-full bg-[#060a14] border border-[#1e2d4a] p-2 text-[#f0f6ff] focus:border-[#388bfd] outline-none font-mono text-sm"
-                      placeholder="https://..."
+                      placeholder="Or paste an image URL here..."
                     />
                   </div>
                   <div>

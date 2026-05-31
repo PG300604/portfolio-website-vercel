@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useGitHubData } from '../hooks/useGitHubData';
 import { writeGitHubData } from '../hooks/useGitHubWrite';
+import ImageUploader from '../components/shared/ImageUploader';
 
 export default function ProjectsAdmin() {
   const { data: initialProjects, loading: dataLoading, error: fetchError } = useGitHubData('projects.json');
@@ -187,8 +188,19 @@ function ProjectEditor({ project, onSave, onCancel }) {
         </div>
 
         <div>
-          <label className="block font-mono text-[11px] text-[#8fa3c0] uppercase tracking-widest mb-1">Image URL (raw GitHub URL)</label>
-          <input name="imageUrl" value={formData.imageUrl} onChange={handleChange} className="w-full bg-[#060a14] text-[#f0f6ff] border-2 border-[#1e2d4a] p-2 font-mono text-sm focus:border-[#1A56DB] focus:outline-none" />
+          <label className="block font-mono text-[11px] text-[#8fa3c0] uppercase tracking-widest mb-1">Project Image</label>
+          <div className="space-y-2">
+            <ImageUploader 
+              onUploadSuccess={(url) => setFormData(prev => ({ ...prev, imageUrl: url }))} 
+            />
+            <input 
+              name="imageUrl" 
+              value={formData.imageUrl} 
+              onChange={handleChange} 
+              placeholder="Or paste an image URL here..."
+              className="w-full bg-[#060a14] text-[#f0f6ff] border-2 border-[#1e2d4a] p-2 font-mono text-sm focus:border-[#1A56DB] focus:outline-none" 
+            />
+          </div>
         </div>
 
         <div className="flex gap-6 mt-2">

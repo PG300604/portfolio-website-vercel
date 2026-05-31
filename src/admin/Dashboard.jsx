@@ -61,6 +61,7 @@ export default function Dashboard() {
             <DashboardLink to="/admin/about" label="About & Stats" />
             <DashboardLink to="/admin/visibility" label="Visibility Toggles" />
             <DashboardLink to="/admin/resume" label="Resume PDF" />
+            <DashboardLink to="/admin/settings" label="Settings & Security" />
             <DashboardLink to="/" label="View Public Site" external />
           </div>
         </div>

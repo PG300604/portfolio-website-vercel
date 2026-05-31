@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useGitHubData } from '../hooks/useGitHubData';
 import { writeGitHubData } from '../hooks/useGitHubWrite';
 import { Link } from 'react-router-dom';
+import ImageUploader from '../components/shared/ImageUploader';
 
 export default function BlogsAdmin() {
   const { data, loading, error: fetchError, refetch } = useGitHubData('blogs.json');
@@ -96,12 +97,16 @@ export default function BlogsAdmin() {
                     <span className="text-[#8fa3c0] font-mono text-xs">No Cover Image</span>
                   )}
                 </div>
-                <div>
-                  <label className="block font-mono text-[11px] text-[#8fa3c0] mb-1">Image URL</label>
+                <div className="space-y-2">
+                  <label className="block font-mono text-[11px] text-[#8fa3c0] mb-1">Cover Image</label>
+                  <ImageUploader 
+                    onUploadSuccess={(url) => updateBlog(blog.id, 'image', url)}
+                  />
                   <input 
                     type="text" 
                     value={blog.image || ''} 
                     onChange={(e) => updateBlog(blog.id, 'image', e.target.value)}
+                    placeholder="Or paste an image URL here..."
                     className="w-full bg-[#060a14] border border-[#1e2d4a] p-2 text-[#f0f6ff] focus:border-[#388bfd] outline-none font-mono text-sm"
                   />
                 </div>

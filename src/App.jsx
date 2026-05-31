@@ -14,6 +14,7 @@ import ResumeAdmin from './admin/ResumeAdmin';
 import TimelineAdmin from './admin/TimelineAdmin';
 import MediaAdmin from './admin/MediaAdmin';
 import BlogsAdmin from './admin/BlogsAdmin';
+import SettingsAdmin from './admin/SettingsAdmin';
 
 // Public Views
 import Navbar from './components/shared/Navbar';
@@ -68,6 +69,7 @@ function App() {
             <Route path="timeline" element={<TimelineAdmin />} />
             <Route path="media" element={<MediaAdmin />} />
             <Route path="blogs" element={<BlogsAdmin />} />
+            <Route path="settings" element={<SettingsAdmin />} />
             <Route path="*" element={<Dashboard />} />
           </Route>
         </Routes>

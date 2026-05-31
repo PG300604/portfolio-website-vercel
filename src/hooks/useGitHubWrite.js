@@ -48,3 +48,44 @@ export async function writeGitHubData(filename, newData) {
     throw error;
   }
 }
+
+export async function uploadGitHubImage(file) {
+  const token = import.meta.env.VITE_GH_TOKEN;
+  const owner = import.meta.env.VITE_GH_OWNER;
+  const repo = import.meta.env.VITE_GH_REPO;
+  const branch = import.meta.env.VITE_GH_BRANCH || 'main';
+  
+  if (!token || !owner || !repo) {
+    throw new Error('GitHub configuration missing in .env');
+  }
+
+  // Generate clean unique filename
+  const fileExt = file.name.split('.').pop();
+  const cleanName = file.name.replace(/[^a-zA-Z0-9]/g, '_').split('_')[0] || 'upload';
+  const filename = `${cleanName}_${Date.now()}.${fileExt}`;
+  
+  const url = `https://api.github.com/repos/${owner}/${repo}/contents/uploads/${filename}`;
+  
+  // Convert file to base64
+  const base64Data = await new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => {
+      const base64 = reader.result.split(',')[1];
+      resolve(base64);
+    };
+    reader.onerror = (err) => reject(err);
+    reader.readAsDataURL(file);
+  });
+
+  const payload = {
+    message: `upload: image ${filename}`,
+    content: base64Data,
+    branch: branch
+  };
+
+  await axios.put(url, payload, {
+    headers: { Authorization: `Bearer ${token}` }
+  });
+
+  return `https://raw.githubusercontent.com/${owner}/${repo}/${branch}/uploads/${filename}`;
+}
