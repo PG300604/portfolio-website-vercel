@@ -14,24 +14,40 @@ export function AuthProvider({ children }) {
   const [loading, setLoading] = useState(true);
   const [credentials, setCredentials] = useState(null);
 
-  const fetchCredentials = () => {
+  const fetchCredentials = async () => {
     const owner = import.meta.env.VITE_GH_OWNER;
     const repo = import.meta.env.VITE_GH_REPO;
-    const branch = import.meta.env.VITE_GH_BRANCH || 'main';
+    const token = import.meta.env.VITE_GH_TOKEN;
 
-    if (owner && repo) {
-      fetch(`https://raw.githubusercontent.com/${owner}/${repo}/${branch}/data/credentials.json?t=${Date.now()}`)
-        .then(res => res.ok ? res.json() : null)
-        .then(data => setCredentials(data))
-        .catch(() => {});
+    if (owner && repo && token) {
+      try {
+        const res = await fetch(`https://api.github.com/repos/${owner}/${repo}/contents/data/credentials.json`, {
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Accept': 'application/vnd.github.v3.raw',
+            'Cache-Control': 'no-cache'
+          }
+        });
+        if (res.ok) {
+          const data = await res.json();
+          setCredentials(data);
+          return data;
+        }
+      } catch (err) {
+        console.error('Error fetching credentials:', err);
+      }
     }
+    return null;
   };
 
   useEffect(() => {
-    fetchCredentials();
-    const isAuthed = localStorage.getItem('pg_admin') === 'true';
-    setAuthed(isAuthed);
-    setLoading(false);
+    const initAuth = async () => {
+      await fetchCredentials();
+      const isAuthed = localStorage.getItem('pg_admin') === 'true';
+      setAuthed(isAuthed);
+      setLoading(false);
+    };
+    initAuth();
   }, []);
 
   const login = async (password) => {
