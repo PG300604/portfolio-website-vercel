@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useAuth } from '../context/AuthContext';
+import { useAuth } from '../hooks/useAuth';
 import { writeGitHubData } from '../hooks/useGitHubWrite';
 import { Link } from 'react-router-dom';
 
@@ -46,8 +46,10 @@ export default function SettingsAdmin() {
 
   useEffect(() => {
     if (credentials?.questions && credentials.questions.length >= 2) {
-      setQ1(credentials.questions[0].question);
-      setQ2(credentials.questions[1].question);
+      queueMicrotask(() => {
+        setQ1(credentials.questions[0].question);
+        setQ2(credentials.questions[1].question);
+      });
     }
   }, [credentials]);
 

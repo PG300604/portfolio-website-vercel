@@ -13,7 +13,7 @@ export default function BlogsAdmin() {
 
   useEffect(() => {
     if (data && Array.isArray(data)) {
-      setBlogs(data);
+      queueMicrotask(() => setBlogs(data));
     }
   }, [data]);
 

@@ -11,7 +11,7 @@ export default function CertsAdmin() {
   const [newCert, setNewCert] = useState({ id: '', name: '', org: '', issuedBy: '', date: '', credentialId: '', featured: false });
 
   useEffect(() => {
-    if (initialCerts) setCerts(initialCerts);
+    if (initialCerts) queueMicrotask(() => setCerts(initialCerts));
   }, [initialCerts]);
 
   const handleAdd = async (e) => {

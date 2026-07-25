@@ -13,10 +13,10 @@ export default function TimelineAdmin() {
   // Initialize with some default if file doesn't exist
   useEffect(() => {
     if (initialTimeline) {
-      setTimeline(initialTimeline);
+      queueMicrotask(() => setTimeline(initialTimeline));
     } else if (!loading && fetchError && fetchError.message.includes('404')) {
       // Create an empty array if file is missing
-      setTimeline([]);
+      queueMicrotask(() => setTimeline([]));
     }
   }, [initialTimeline, loading, fetchError]);
 

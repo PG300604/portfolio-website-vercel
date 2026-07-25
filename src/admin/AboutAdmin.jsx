@@ -10,7 +10,7 @@ export default function AboutAdmin() {
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    if (initialAbout) setAbout(initialAbout);
+    if (initialAbout) queueMicrotask(() => setAbout(initialAbout));
   }, [initialAbout]);
 
   const handleChange = (e) => {

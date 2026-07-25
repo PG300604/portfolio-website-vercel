@@ -1,6 +1,5 @@
-import { createContext, useContext, useState, useEffect } from 'react';
-
-const AuthContext = createContext();
+import { useState, useEffect } from 'react';
+import { AuthContext } from './AuthContextObject';
 
 async function hashString(str) {
   const msgBuffer = new TextEncoder().encode(str);
@@ -85,6 +84,3 @@ export function AuthProvider({ children }) {
   );
 }
 
-export function useAuth() {
-  return useContext(AuthContext);
-}

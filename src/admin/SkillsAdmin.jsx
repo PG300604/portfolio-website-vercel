@@ -13,7 +13,7 @@ export default function SkillsAdmin() {
   const [newSkill, setNewSkill] = useState({ id: '', name: '', category: 'frontend' });
 
   useEffect(() => {
-    if (initialSkills) setSkills(initialSkills);
+    if (initialSkills) queueMicrotask(() => setSkills(initialSkills));
   }, [initialSkills]);
 
   const handleAdd = async (e) => {

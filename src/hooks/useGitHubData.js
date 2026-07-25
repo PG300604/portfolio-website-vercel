@@ -11,29 +11,31 @@ export function useGitHubData(filename) {
     const branch = import.meta.env.VITE_GH_BRANCH || 'main';
 
     if (!owner || !repo) {
-      setError(new Error('GitHub owner or repo not configured in .env'));
-      setLoading(false);
+      queueMicrotask(() => {
+        setError(new Error('GitHub owner or repo not configured in .env'));
+        setLoading(false);
+      });
       return;
     }
 
-    setLoading(true);
-    const timestamp = new Date().getTime();
-    fetch(`https://raw.githubusercontent.com/${owner}/${repo}/${branch}/data/${filename}?t=${timestamp}`)
-      .then((res) => {
+    const fetchData = async () => {
+      try {
+        const timestamp = new Date().getTime();
+        const res = await fetch(`https://raw.githubusercontent.com/${owner}/${repo}/${branch}/data/${filename}?t=${timestamp}`);
         if (!res.ok) {
           throw new Error(`Failed to fetch ${filename}: ${res.statusText}`);
         }
-        return res.json();
-      })
-      .then((jsonData) => {
+        const jsonData = await res.json();
         setData(jsonData);
         setLoading(false);
-      })
-      .catch((err) => {
+      } catch (err) {
         console.error('useGitHubData Error:', err);
         setError(err);
         setLoading(false);
-      });
+      }
+    };
+
+    fetchData();
   }, [filename]);
 
   return { data, loading, error };

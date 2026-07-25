@@ -13,7 +13,7 @@ export default function ProjectsAdmin() {
 
   useEffect(() => {
     if (initialProjects) {
-      setProjects(initialProjects);
+      queueMicrotask(() => setProjects(initialProjects));
     }
   }, [initialProjects]);
 

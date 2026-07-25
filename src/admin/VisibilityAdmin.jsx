@@ -10,7 +10,7 @@ export default function VisibilityAdmin() {
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    if (initialVisibility) setVisibility(initialVisibility);
+    if (initialVisibility) queueMicrotask(() => setVisibility(initialVisibility));
   }, [initialVisibility]);
 
   const handleChange = async (key, value) => {

@@ -14,15 +14,17 @@ export default function MediaAdmin() {
 
   useEffect(() => {
     if (data) {
-      if (Array.isArray(data)) {
-        // Legacy format migration
-        setMediaData({ profiles: [], items: data });
-      } else {
-        setMediaData({
-          profiles: data.profiles || [],
-          items: data.items || []
-        });
-      }
+      queueMicrotask(() => {
+        if (Array.isArray(data)) {
+          // Legacy format migration
+          setMediaData({ profiles: [], items: data });
+        } else {
+          setMediaData({
+            profiles: data.profiles || [],
+            items: data.items || []
+          });
+        }
+      });
     }
   }, [data]);
 

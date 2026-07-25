@@ -1,4 +1,3 @@
-import { motion } from 'framer-motion';
 import { useGitHubData } from '../../hooks/useGitHubData';
 import SectionLabel from '../shared/SectionLabel';
 
