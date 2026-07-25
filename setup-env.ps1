@@ -12,8 +12,7 @@ param (
 Write-Host "--- Portfolio Environment Setup ---" -ForegroundColor Cyan
 
 if ([string]::IsNullOrEmpty($AdminSecret)) {
-    $AdminSecret = Read-Host -Prompt "Enter Admin Secret (Default: Priyanshu@Admin2026)"
-    if ([string]::IsNullOrEmpty($AdminSecret)) { $AdminSecret = "Priyanshu@Admin2026" }
+    $AdminSecret = Read-Host -Prompt "Enter Admin Secret"
 }
 
 if ([string]::IsNullOrEmpty($GhToken)) {
@@ -34,15 +33,15 @@ if ([string]::IsNullOrEmpty($GhBranch)) {
 }
 
 if ([string]::IsNullOrEmpty($EmailService)) {
-    $EmailService = Read-Host -Prompt "Enter EmailJS Service ID (e.g. service_fex03bg)"
+    $EmailService = Read-Host -Prompt "Enter EmailJS Service ID"
 }
 
 if ([string]::IsNullOrEmpty($EmailTemplate)) {
-    $EmailTemplate = Read-Host -Prompt "Enter EmailJS Template ID (e.g. template_athu7cj)"
+    $EmailTemplate = Read-Host -Prompt "Enter EmailJS Template ID"
 }
 
 if ([string]::IsNullOrEmpty($EmailKey)) {
-    $EmailKey = Read-Host -Prompt "Enter EmailJS Public Key (e.g. oBJXBkHnlkoI3i_tg)"
+    $EmailKey = Read-Host -Prompt "Enter EmailJS Public Key"
 }
 
 $envContent = @"
