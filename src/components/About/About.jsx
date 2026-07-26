@@ -68,19 +68,13 @@ export default function About() {
                       alt="Priyanshu Profile"
                       className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
                       onError={(e) => {
-                        e.target.onerror = null;
-                        e.target.style.display = 'none';
-                        e.target.nextSibling.style.display = 'flex';
+                        if (e.target.src.endsWith('/profile.png')) {
+                          e.target.src = '/profile.jpg';
+                        } else if (e.target.src.endsWith('/profile.jpg')) {
+                          e.target.src = '/Homepage.png';
+                        }
                       }}
                     />
-                    
-                    {/* Fallback Avatar Placeholder */}
-                    <div className="hidden absolute inset-0 flex-col items-center justify-center bg-[var(--bg-main)] p-6 text-center">
-                      <div className="w-20 h-20 rounded-full border border-dashed border-[var(--text-main)] flex items-center justify-center mb-4">
-                        <User className="w-10 h-10 text-[var(--text-main)]" />
-                      </div>
-                      <p className="font-mono-custom text-xs text-[var(--text-main)] uppercase tracking-wider mb-1">PROFILE PHOTO</p>
-                    </div>
                   </div>
 
                   <div className="flex justify-between items-center mt-3 font-mono-custom text-xs text-[var(--text-muted)]">
@@ -100,6 +94,11 @@ export default function About() {
                     src={photoSrc}
                     alt="Priyanshu High Res"
                     className="w-full h-full object-contain"
+                    onError={(e) => {
+                      if (e.target.src.endsWith('/profile.png')) {
+                        e.target.src = '/profile.jpg';
+                      }
+                    }}
                   />
                 </div>
               </DialogContent>

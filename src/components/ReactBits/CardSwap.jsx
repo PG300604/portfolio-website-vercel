@@ -1,4 +1,4 @@
-import React, { Children, cloneElement, forwardRef, isValidElement, useEffect, useMemo, useRef, useState } from 'react';
+import React, { Children, cloneElement, forwardRef, isValidElement, useEffect, useMemo, useRef } from 'react';
 import gsap from 'gsap';
 import './CardSwap.css';
 
@@ -11,8 +11,8 @@ const getSlotTransform = (index, distX, distY, total) => {
   return {
     x: index * distX,
     y: -index * distY,
-    z: -index * 90,
-    scale: 1 - index * 0.04,
+    z: -index * 100,
+    scale: 1 - index * 0.05,
     zIndex: total - index
   };
 };
@@ -22,7 +22,7 @@ const CardSwap = ({
   height = 340,
   cardDistance = 32,
   verticalDistance = 36,
-  delay = 3500,
+  delay = 4000,
   pauseOnHover = true,
   onCardClick,
   skewAmount = 2,
@@ -70,7 +70,7 @@ const CardSwap = ({
           scale: slot.scale,
           skewY: skewAmount,
           zIndex: slot.zIndex,
-          duration: 0.5,
+          duration: 0.45,
           ease: 'power2.out',
           overwrite: 'auto'
         });
@@ -78,7 +78,7 @@ const CardSwap = ({
     });
   };
 
-  // Perform card swap transition
+  // Perform card swap transition (Slides left/out then back, avoiding bottom button collision)
   const doSwap = () => {
     if (totalCards < 2 || isAnimatingRef.current) return;
     isAnimatingRef.current = true;
@@ -91,12 +91,12 @@ const CardSwap = ({
       return;
     }
 
-    // Step 1: Drop front card down smoothly
+    // Step 1: Slide front card out to the left
     gsap.to(frontEl, {
-      y: 180,
-      opacity: 0.7,
-      scale: 0.95,
-      duration: 0.3,
+      x: '-=240',
+      opacity: 0.85,
+      scale: 1.02,
+      duration: 0.28,
       ease: 'power2.in',
       onComplete: () => {
         // Step 2: Rotate order array
@@ -197,12 +197,12 @@ const CardSwap = ({
       </div>
 
       {/* Side Quick Navigation Controls */}
-      <div className="mt-8 flex items-center gap-4 font-mono-custom text-xs">
+      <div className="mt-6 flex items-center gap-4 font-mono-custom text-xs">
         <button
           onClick={doSwap}
-          className="px-5 py-2.5 rounded-full border border-[var(--border-subtle)] bg-[var(--card-bg)] text-[var(--text-main)] hover:border-[var(--text-main)] transition-all font-bold shadow-lg uppercase"
+          className="px-6 py-3 rounded-full border border-[var(--border-subtle)] bg-[var(--card-bg)] text-[var(--text-main)] hover:border-[var(--text-main)] transition-all font-bold shadow-xl uppercase cursor-pointer"
         >
-          [ SWAP CARD NEXT ➔ ]
+          [ SWAP MODULE CARD ➔ ]
         </button>
       </div>
     </div>

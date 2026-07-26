@@ -19,27 +19,30 @@ import { FaJava } from 'react-icons/fa';
 import { Cpu, Layout, Server, Terminal } from 'lucide-react';
 
 export default function TechStack() {
-  const { data: skillsData } = useGitHubData('skills.json');
   const { data: visibility } = useGitHubData('visibility.json');
 
   if (visibility && !visibility.stack) return null;
 
-  const defaultSkills = [
-    { id: '1', name: 'Java 17/21', category: 'Backend Architecture' },
+  const skills = [
+    { id: '1', name: 'Java 21', category: 'Backend Architecture' },
     { id: '2', name: 'Spring Boot 3', category: 'Backend Architecture' },
-    { id: '3', name: 'REST APIs & WebSockets', category: 'Backend Architecture' },
-    { id: '4', name: 'PostgreSQL & SQL', category: 'Backend Architecture' },
+    { id: '3', name: 'REST APIs & Microservices', category: 'Backend Architecture' },
+    { id: '4', name: 'PostgreSQL & MySQL', category: 'Backend Architecture' },
     { id: '5', name: 'Redis Caching', category: 'Backend Architecture' },
+    { id: '6', name: 'WebSockets & Messaging', category: 'Backend Architecture' },
 
-    { id: '6', name: 'React 19 & JSX', category: 'Interface Systems' },
-    { id: '7', name: 'Next.js & SSR', category: 'Interface Systems' },
-    { id: '8', name: 'TypeScript', category: 'Interface Systems' },
-    { id: '9', name: 'Shadcn & TailwindCSS', category: 'Interface Systems' },
-    { id: '10', name: 'GSAP & Three.js', category: 'Interface Systems' },
+    { id: '7', name: 'React 19 & JSX', category: 'Interface Systems' },
+    { id: '8', name: 'Next.js 15 & SSR', category: 'Interface Systems' },
+    { id: '9', name: 'TypeScript', category: 'Interface Systems' },
+    { id: '10', name: 'Shadcn UI & TailwindCSS', category: 'Interface Systems' },
+    { id: '11', name: 'GSAP & Motion', category: 'Interface Systems' },
+    { id: '12', name: 'Three.js & WebGL', category: 'Interface Systems' },
 
-    { id: '11', name: 'Docker & Containers', category: 'DevOps & Tooling' },
-    { id: '12', name: 'Git & GitHub Actions', category: 'DevOps & Tooling' },
-    { id: '13', name: 'Vite & Rolldown', category: 'DevOps & Tooling' },
+    { id: '13', name: 'Docker & Containers', category: 'DevOps & Tooling' },
+    { id: '14', name: 'Git & GitHub Actions', category: 'DevOps & Tooling' },
+    { id: '15', name: 'Vite & Build Tools', category: 'DevOps & Tooling' },
+    { id: '16', name: 'CI/CD Pipelines', category: 'DevOps & Tooling' },
+    { id: '17', name: 'Linux Server Admin', category: 'DevOps & Tooling' },
   ];
 
   const techLogos = [
@@ -56,14 +59,11 @@ export default function TechStack() {
     { node: <SiGit />, title: "Git", href: "https://git-scm.com" },
   ];
 
-  const skills = (skillsData && skillsData.length >= 6) ? skillsData : defaultSkills;
   const categories = [...new Set(skills.map(s => s.category))];
 
   const categoryIcons = {
     'Backend Architecture': <Server className="w-5 h-5 text-emerald-400" />,
-    'Backend Systems': <Server className="w-5 h-5 text-emerald-400" />,
     'Interface Systems': <Layout className="w-5 h-5 text-sky-400" />,
-    'Interface & Motion': <Layout className="w-5 h-5 text-sky-400" />,
     'DevOps & Tooling': <Terminal className="w-5 h-5 text-amber-400" />
   };
 
@@ -86,18 +86,18 @@ export default function TechStack() {
             </ScrollFloat>
           </div>
           <span className="font-mono-custom text-xs text-[var(--text-muted)] uppercase">
-            [ 3D CARDS SWAP • HOVER OR CLICK CARD TO SWAP ]
+            [ 3D CARDS SWAP • CLICK ANY CARD OR BUTTON TO SWAP ]
           </span>
         </div>
 
         {/* React Bits CardSwap 3D Interactive Card Stack Stage */}
-        <div className="h-[520px] w-full relative flex flex-col items-center justify-center mb-12 overflow-visible">
+        <div className="h-[480px] w-full relative flex flex-col items-center justify-center mb-12 overflow-visible">
           <CardSwap
             width={540}
             height={340}
             cardDistance={32}
             verticalDistance={36}
-            delay={3500}
+            delay={4000}
             pauseOnHover={true}
             skewAmount={2}
           >
