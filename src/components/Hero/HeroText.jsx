@@ -38,7 +38,7 @@ export default function HeroText() {
   };
 
   return (
-    <div className="z-20 relative min-h-screen flex flex-col justify-center max-w-6xl mx-auto px-6 pt-32 pb-20 pointer-events-auto">
+    <div className="z-20 relative min-h-screen flex flex-col justify-center max-w-6xl mx-auto px-4 sm:px-6 pt-20 sm:pt-32 pb-12 sm:pb-20 pointer-events-auto">
       
       <motion.div
         variants={containerVariants}

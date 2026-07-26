@@ -39,7 +39,7 @@ import GradualBlur from './components/ReactBits/GradualBlur';
 
 function PublicLayout() {
   const [theme, setTheme] = useState('dark'); // 'dark' | 'cream'
-  const [viewMode, setViewMode] = useState('gallery'); // 'gallery' | 'list'
+  const [viewMode, setViewMode] = useState('list'); // 'list' | 'gallery'
   const [activeSection, setActiveSection] = useState('projects');
 
   useEffect(() => {
@@ -125,7 +125,7 @@ function PublicLayout() {
         <Hero />
 
         {/* React Bits FlowingMenu Marquee Navigation — Positioned Right After Hero with Custom 3D Artwork */}
-        <div className="my-12 py-8 border-y border-[var(--border-subtle)] overflow-hidden relative z-10 bg-[var(--card-bg)]/40 backdrop-blur-md">
+        <div className="my-6 sm:my-12 py-4 sm:py-8 border-y border-[var(--border-subtle)] overflow-hidden relative z-10 bg-[var(--card-bg)]/40 backdrop-blur-md">
           <FlowingMenu items={flowingMenuItems} speed={14} />
         </div>
 

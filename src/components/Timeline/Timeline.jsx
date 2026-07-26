@@ -46,22 +46,22 @@ export default function Timeline() {
   });
 
   return (
-    <section id="experience" className="py-32 bg-[var(--bg-main)] relative z-10 border-t border-[var(--border-subtle)]">
-      <div className="max-w-4xl mx-auto px-6">
+    <section id="experience" className="py-16 sm:py-32 bg-[var(--bg-main)] relative z-10 border-t border-[var(--border-subtle)]">
+      <div className="max-w-4xl mx-auto px-4 sm:px-6">
         
         {/* Section Header */}
-        <div className="flex justify-between items-end mb-16 pb-6 border-b border-[var(--border-subtle)]">
+        <div className="flex justify-between items-end mb-10 sm:mb-16 pb-4 sm:pb-6 border-b border-[var(--border-subtle)]">
           <div>
-            <span className="font-mono-custom text-xs text-[var(--text-muted)] uppercase tracking-widest block mb-2">
+            <span className="font-mono-custom text-[10px] sm:text-xs text-[var(--text-muted)] uppercase tracking-widest block mb-2">
               [ JOURNEY & TIMELINE ]
             </span>
-            <h2 className="text-3xl sm:text-5xl font-sora font-extrabold text-[var(--text-main)]">
+            <h2 className="text-2xl sm:text-3xl md:text-5xl font-sora font-extrabold text-[var(--text-main)]">
               Experience & Academic History
             </h2>
           </div>
         </div>
 
-        <div className="relative pl-6 sm:pl-10 space-y-12 border-l border-[var(--border-subtle)]">
+        <div className="relative pl-5 sm:pl-10 space-y-8 sm:space-y-12 border-l border-[var(--border-subtle)]">
           {timeline.map((item, idx) => (
             <motion.div
               key={item.id || idx}
@@ -77,18 +77,18 @@ export default function Timeline() {
                 {item.active && <div className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping" />}
               </div>
 
-              <div className="bg-[var(--card-bg)] border border-[var(--border-subtle)] hover:border-[var(--border-strong)] p-8 rounded-2xl transition-all shadow-xl">
-                <div className="flex items-center justify-between font-mono-custom text-xs text-[var(--text-muted)] mb-2">
+              <div className="bg-[var(--card-bg)] border border-[var(--border-subtle)] hover:border-[var(--border-strong)] p-5 sm:p-8 rounded-xl sm:rounded-2xl transition-all shadow-xl">
+                <div className="flex items-center justify-between font-mono-custom text-[10px] sm:text-xs text-[var(--text-muted)] mb-2">
                   <span>[{item.year}]</span>
                   {item.active && <span className="text-emerald-400 font-bold">[ PRESENT ]</span>}
                 </div>
-                <h3 className="text-xl font-sora font-bold text-[var(--text-main)] mb-1">
+                <h3 className="text-base sm:text-xl font-sora font-bold text-[var(--text-main)] mb-1">
                   {item.title}
                 </h3>
-                <div className="font-mono-custom text-xs text-[var(--text-main)] font-bold mb-4">
+                <div className="font-mono-custom text-[10px] sm:text-xs text-[var(--text-main)] font-bold mb-3 sm:mb-4">
                   {item.org}
                 </div>
-                <p className="font-mono-custom text-xs text-[var(--text-muted)] leading-relaxed">
+                <p className="font-mono-custom text-[11px] sm:text-xs text-[var(--text-muted)] leading-relaxed">
                   {item.desc}
                 </p>
               </div>
