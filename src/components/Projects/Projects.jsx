@@ -88,7 +88,7 @@ export default function Projects({ viewMode = 'list' }) {
     image: p.imageUrl || p.image || '/Homepage.png',
     link: p.liveUrl || '#',
     title: p.title,
-    description: p.description
+    description: ''
   }));
 
   const handlePosterClick = (index) => {
