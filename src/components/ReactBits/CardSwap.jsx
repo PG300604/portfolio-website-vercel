@@ -1,4 +1,4 @@
-import React, { Children, cloneElement, forwardRef, isValidElement, useEffect, useMemo, useRef } from 'react';
+import React, { Children, cloneElement, forwardRef, isValidElement, useEffect, useMemo, useRef, useState } from 'react';
 import gsap from 'gsap';
 import './CardSwap.css';
 
@@ -7,156 +7,173 @@ export const Card = forwardRef(({ customClass, ...rest }, ref) => (
 ));
 Card.displayName = 'Card';
 
-const makeSlot = (i, distX, distY, total) => ({
-  x: i * distX,
-  y: -i * distY,
-  z: -i * distX * 1.5,
-  zIndex: total - i
-});
-
-const placeNow = (el, slot, skew) =>
-  gsap.set(el, {
-    x: slot.x,
-    y: slot.y,
-    z: slot.z,
-    xPercent: -50,
-    yPercent: -50,
-    skewY: skew,
-    transformOrigin: 'center center',
-    zIndex: slot.zIndex,
-    force3D: true
-  });
+const getSlotTransform = (index, distX, distY, total) => {
+  return {
+    x: index * distX,
+    y: -index * distY,
+    z: -index * 90,
+    scale: 1 - index * 0.04,
+    zIndex: total - index
+  };
+};
 
 const CardSwap = ({
-  width = 500,
-  height = 400,
-  cardDistance = 60,
-  verticalDistance = 70,
+  width = 540,
+  height = 340,
+  cardDistance = 32,
+  verticalDistance = 36,
   delay = 3500,
-  pauseOnHover = false,
+  pauseOnHover = true,
   onCardClick,
-  skewAmount = 6,
+  skewAmount = 2,
   children
 }) => {
-  // Snappy, ultra-responsive 450ms animation settings
-  const config = {
-    ease: 'power2.out',
-    durDrop: 0.45,
-    durMove: 0.45,
-    durReturn: 0.45,
-    promoteOverlap: 0.6,
-    returnDelay: 0.08
-  };
-
   const childArr = useMemo(() => Children.toArray(children), [children]);
+  const totalCards = childArr.length;
+  
   const refs = useMemo(
     () => childArr.map(() => React.createRef()),
     [childArr.length]
   );
 
-  const order = useRef(Array.from({ length: childArr.length }, (_, i) => i));
-  const tlRef = useRef(null);
-  const intervalRef = useRef();
-  const container = useRef(null);
-  const swapRef = useRef(null);
+  const orderRef = useRef(Array.from({ length: totalCards }, (_, i) => i));
+  const isAnimatingRef = useRef(false);
+  const timerRef = useRef(null);
+  const containerRef = useRef(null);
+
+  // Apply slot transforms deterministically
+  const applySlots = (isInitial = false) => {
+    orderRef.current.forEach((cardIdx, slotIdx) => {
+      const el = refs[cardIdx]?.current;
+      if (!el) return;
+
+      const slot = getSlotTransform(slotIdx, cardDistance, verticalDistance, totalCards);
+
+      if (isInitial) {
+        gsap.set(el, {
+          x: slot.x,
+          y: slot.y,
+          z: slot.z,
+          scale: slot.scale,
+          xPercent: -50,
+          yPercent: -50,
+          skewY: skewAmount,
+          zIndex: slot.zIndex,
+          transformOrigin: 'center center',
+          force3D: true
+        });
+      } else {
+        gsap.to(el, {
+          x: slot.x,
+          y: slot.y,
+          z: slot.z,
+          scale: slot.scale,
+          skewY: skewAmount,
+          zIndex: slot.zIndex,
+          duration: 0.5,
+          ease: 'power2.out',
+          overwrite: 'auto'
+        });
+      }
+    });
+  };
+
+  // Perform card swap transition
+  const doSwap = () => {
+    if (totalCards < 2 || isAnimatingRef.current) return;
+    isAnimatingRef.current = true;
+
+    const frontIdx = orderRef.current[0];
+    const frontEl = refs[frontIdx]?.current;
+
+    if (!frontEl) {
+      isAnimatingRef.current = false;
+      return;
+    }
+
+    // Step 1: Drop front card down smoothly
+    gsap.to(frontEl, {
+      y: 180,
+      opacity: 0.7,
+      scale: 0.95,
+      duration: 0.3,
+      ease: 'power2.in',
+      onComplete: () => {
+        // Step 2: Rotate order array
+        orderRef.current.push(orderRef.current.shift());
+
+        // Step 3: Animate all cards to their new slots
+        orderRef.current.forEach((cIdx, sIdx) => {
+          const el = refs[cIdx]?.current;
+          if (!el) return;
+
+          const slot = getSlotTransform(sIdx, cardDistance, verticalDistance, totalCards);
+          
+          if (cIdx === frontIdx) {
+            // Move front card into back slot
+            gsap.set(el, { zIndex: slot.zIndex });
+            gsap.to(el, {
+              x: slot.x,
+              y: slot.y,
+              z: slot.z,
+              scale: slot.scale,
+              opacity: 1,
+              duration: 0.35,
+              ease: 'power2.out',
+              onComplete: () => {
+                isAnimatingRef.current = false;
+              }
+            });
+          } else {
+            // Move remaining cards forward
+            gsap.to(el, {
+              x: slot.x,
+              y: slot.y,
+              z: slot.z,
+              scale: slot.scale,
+              zIndex: slot.zIndex,
+              opacity: 1,
+              duration: 0.35,
+              ease: 'power2.out'
+            });
+          }
+        });
+      }
+    });
+  };
+
+  const startAutoPlay = () => {
+    stopAutoPlay();
+    timerRef.current = setInterval(doSwap, delay);
+  };
+
+  const stopAutoPlay = () => {
+    if (timerRef.current) clearInterval(timerRef.current);
+  };
 
   useEffect(() => {
-    const total = refs.length;
-    refs.forEach((r, i) => placeNow(r.current, makeSlot(i, cardDistance, verticalDistance, total), skewAmount));
+    applySlots(true);
+    startAutoPlay();
 
-    const swap = () => {
-      if (order.current.length < 2) return;
-      if (tlRef.current && tlRef.current.isActive()) return;
-
-      const [front, ...rest] = order.current;
-      const elFront = refs[front]?.current;
-      if (!elFront) return;
-
-      const tl = gsap.timeline();
-      tlRef.current = tl;
-
-      tl.to(elFront, {
-        y: '+=380',
-        duration: config.durDrop,
-        ease: config.ease
-      });
-
-      tl.addLabel('promote', `-=${config.durDrop * config.promoteOverlap}`);
-      rest.forEach((idx, i) => {
-        const el = refs[idx]?.current;
-        if (!el) return;
-        const slot = makeSlot(i, cardDistance, verticalDistance, refs.length);
-        tl.set(el, { zIndex: slot.zIndex }, 'promote');
-        tl.to(
-          el,
-          {
-            x: slot.x,
-            y: slot.y,
-            z: slot.z,
-            duration: config.durMove,
-            ease: config.ease
-          },
-          `promote+=${i * 0.08}`
-        );
-      });
-
-      const backSlot = makeSlot(refs.length - 1, cardDistance, verticalDistance, refs.length);
-      tl.addLabel('return', `promote+=${config.durMove * config.returnDelay}`);
-      tl.call(
-        () => {
-          gsap.set(elFront, { zIndex: backSlot.zIndex });
-        },
-        undefined,
-        'return'
-      );
-      tl.to(
-        elFront,
-        {
-          x: backSlot.x,
-          y: backSlot.y,
-          z: backSlot.z,
-          duration: config.durReturn,
-          ease: config.ease
-        },
-        'return'
-      );
-
-      tl.call(() => {
-        order.current = [...rest, front];
-      });
-    };
-
-    swapRef.current = swap;
-
-    intervalRef.current = window.setInterval(swap, delay);
-
-    if (pauseOnHover) {
-      const node = container.current;
-      if (node) {
-        const pause = () => {
-          clearInterval(intervalRef.current);
-        };
-        const resume = () => {
-          clearInterval(intervalRef.current);
-          intervalRef.current = window.setInterval(swap, delay);
-        };
-        node.addEventListener('mouseenter', pause);
-        node.addEventListener('mouseleave', resume);
-        return () => {
-          node.removeEventListener('mouseenter', pause);
-          node.removeEventListener('mouseleave', resume);
-          clearInterval(intervalRef.current);
-        };
-      }
+    const node = containerRef.current;
+    if (pauseOnHover && node) {
+      const handleEnter = () => stopAutoPlay();
+      const handleLeave = () => startAutoPlay();
+      node.addEventListener('mouseenter', handleEnter);
+      node.addEventListener('mouseleave', handleLeave);
+      return () => {
+        node.removeEventListener('mouseenter', handleEnter);
+        node.removeEventListener('mouseleave', handleLeave);
+        stopAutoPlay();
+      };
     }
-    return () => clearInterval(intervalRef.current);
-  }, [cardDistance, verticalDistance, delay, pauseOnHover, skewAmount]);
 
-  const handleCardClick = (i, e) => {
-    if (swapRef.current) {
-      swapRef.current();
-    }
-    onCardClick?.(i);
+    return () => stopAutoPlay();
+  }, [totalCards, cardDistance, verticalDistance, delay, pauseOnHover, skewAmount]);
+
+  const handleCardClick = (idx, e) => {
+    doSwap();
+    onCardClick?.(idx);
   };
 
   const rendered = childArr.map((child, i) =>
@@ -174,8 +191,20 @@ const CardSwap = ({
   );
 
   return (
-    <div ref={container} className="card-swap-container" style={{ width, height }}>
-      {rendered}
+    <div className="flex flex-col items-center">
+      <div ref={containerRef} className="card-swap-container cursor-pointer" style={{ width, height }}>
+        {rendered}
+      </div>
+
+      {/* Side Quick Navigation Controls */}
+      <div className="mt-8 flex items-center gap-4 font-mono-custom text-xs">
+        <button
+          onClick={doSwap}
+          className="px-5 py-2.5 rounded-full border border-[var(--border-subtle)] bg-[var(--card-bg)] text-[var(--text-main)] hover:border-[var(--text-main)] transition-all font-bold shadow-lg uppercase"
+        >
+          [ SWAP CARD NEXT ➔ ]
+        </button>
+      </div>
     </div>
   );
 };
