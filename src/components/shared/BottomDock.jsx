@@ -7,12 +7,7 @@ export default function BottomDock({ activeSection, viewMode, setViewMode, theme
 
   useEffect(() => {
     const handleScroll = () => {
-      // Show top dock bar when scrolling past 120px (after Hero top header)
-      if (window.scrollY > 120) {
-        setShowNav(true);
-      } else {
-        setShowNav(true); // Always accessible or smooth reveal after Hero
-      }
+      setShowNav(true);
     };
 
     window.addEventListener('scroll', handleScroll);
@@ -37,12 +32,12 @@ export default function BottomDock({ activeSection, viewMode, setViewMode, theme
       initial={{ opacity: 0, y: -20 }}
       animate={{ opacity: showNav ? 1 : 0, y: showNav ? 0 : -20 }}
       transition={{ duration: 0.3 }}
-      className="fixed top-6 left-0 right-0 z-[60] px-4 flex justify-center items-center pointer-events-none drop-shadow-[0_4px_20px_rgba(0,0,0,0.9)]"
+      className="fixed top-3 sm:top-6 left-0 right-0 z-[60] px-2 sm:px-4 flex justify-center items-center pointer-events-none drop-shadow-[0_4px_20px_rgba(0,0,0,0.9)]"
     >
-      <div className="pointer-events-auto bg-[var(--bg-main)]/95 backdrop-blur-2xl border border-[var(--border-subtle)] p-1.5 rounded-full shadow-2xl flex flex-wrap items-center gap-1 sm:gap-2 font-mono-custom text-xs uppercase tracking-wider text-[var(--text-muted)]">
+      <div className="pointer-events-auto bg-[var(--bg-main)]/95 backdrop-blur-2xl border border-[var(--border-subtle)] p-1 sm:p-1.5 rounded-full shadow-2xl flex items-center gap-0.5 sm:gap-2 font-mono-custom text-[10px] sm:text-xs uppercase tracking-wider text-[var(--text-muted)]">
         
         {/* Navigation Links */}
-        <nav className="flex items-center gap-1 bg-[var(--card-bg)] px-2 py-1 rounded-full border border-[var(--border-subtle)]">
+        <nav className="flex items-center gap-0.5 sm:gap-1 bg-[var(--card-bg)] px-1.5 sm:px-2 py-1 rounded-full border border-[var(--border-subtle)]">
           {navItems.map((item) => {
             const isActive = activeSection === item.id;
             return (
@@ -50,24 +45,23 @@ export default function BottomDock({ activeSection, viewMode, setViewMode, theme
                 key={item.id}
                 href={`#${item.id}`}
                 data-cursor="[ NAVIGATE ]"
-                className={`px-3 py-1 rounded-full transition-all flex items-center gap-1.5 ${
+                className={`px-2 sm:px-3 py-1 rounded-full transition-all flex items-center gap-1 ${
                   isActive
                     ? 'bg-[var(--text-main)] text-[var(--bg-main)] font-bold'
                     : 'hover:text-[var(--text-main)]'
                 }`}
               >
-                <span>[{isActive ? '·' : ' '}]</span>
+                <span className="hidden sm:inline">[{isActive ? '·' : ' '}]</span>
                 <span>{item.label}</span>
               </a>
             );
           })}
         </nav>
 
-        {/* View Mode Toggle (Gallery vs List) */}
+        {/* View Mode Toggle (Desktop only) */}
         <div className="hidden sm:flex items-center gap-1 bg-[var(--card-bg)] px-2 py-1 rounded-full border border-[var(--border-subtle)]">
           <button
             onClick={() => setViewMode('gallery')}
-            data-cursor="[ GALLERY VIEW ]"
             className={`px-2.5 py-1 rounded-full transition-all flex items-center gap-1 ${
               viewMode === 'gallery'
                 ? 'bg-[var(--text-main)] text-[var(--bg-main)] font-bold'
@@ -79,7 +73,6 @@ export default function BottomDock({ activeSection, viewMode, setViewMode, theme
           </button>
           <button
             onClick={() => setViewMode('list')}
-            data-cursor="[ LIST VIEW ]"
             className={`px-2.5 py-1 rounded-full transition-all flex items-center gap-1 ${
               viewMode === 'list'
                 ? 'bg-[var(--text-main)] text-[var(--bg-main)] font-bold'
@@ -91,16 +84,16 @@ export default function BottomDock({ activeSection, viewMode, setViewMode, theme
           </button>
         </div>
 
-        {/* Theme Switcher Button */}
+        {/* Theme Switcher */}
         <button
           onClick={toggleTheme}
           data-cursor="[ SWITCH THEME ]"
-          className="bg-[var(--card-bg)] hover:bg-[var(--hover-bg)] text-[var(--text-main)] border border-[var(--border-subtle)] px-3 py-1.5 rounded-full transition-colors flex items-center gap-1.5"
+          className="bg-[var(--card-bg)] hover:bg-[var(--hover-bg)] text-[var(--text-main)] border border-[var(--border-subtle)] px-2 sm:px-3 py-1.5 rounded-full transition-colors flex items-center gap-1"
         >
           <span>[{theme === 'dark' ? 'CREAM' : 'DARK'}]</span>
         </button>
 
-        {/* Quick Email Pill */}
+        {/* Quick Email Pill (Desktop only) */}
         <button
           onClick={handleCopyEmail}
           data-cursor="[ COPY EMAIL ]"
