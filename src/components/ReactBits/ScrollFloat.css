@@ -1,0 +1,25 @@
+.scroll-float {
+  overflow: visible;
+  display: block;
+}
+
+.scroll-float-text {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  column-gap: 0.3em;
+  row-gap: 0.2em;
+  line-height: 1.1;
+}
+
+.word {
+  display: inline-flex !important;
+  flex-wrap: nowrap !important;
+  white-space: nowrap !important;
+  word-break: keep-all !important;
+}
+
+.char {
+  display: inline-block !important;
+  will-change: opacity, transform;
+}

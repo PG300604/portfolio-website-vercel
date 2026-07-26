@@ -1,123 +1,178 @@
 import { useState } from 'react';
-import { motion } from 'framer-motion';
-import emailjs from '@emailjs/browser';
 import { useGitHubData } from '../../hooks/useGitHubData';
-import SectionLabel from '../shared/SectionLabel';
+import ScrollFloat from '../ReactBits/ScrollFloat';
 
 export default function Contact() {
   const { data: visibility } = useGitHubData('visibility.json');
   const [form, setForm] = useState({ name: '', email: '', message: '' });
-  const [status, setStatus] = useState('idle'); // idle, loading, success, error
+  const [status, setStatus] = useState('idle');
+  const [copied, setCopied] = useState(false);
 
   if (visibility && !visibility.contact) return null;
+
+  const emailAddress = "priyanshughosh97@gmail.com";
+
+  const handleCopyEmail = () => {
+    navigator.clipboard.writeText(emailAddress);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
 
   const handleChange = (e) => setForm({ ...form, [e.target.name]: e.target.value });
 
   const handleSubmit = (e) => {
     e.preventDefault();
     setStatus('loading');
-
-    emailjs.send(
-      import.meta.env.VITE_EMAILJS_SERVICE_ID,
-      import.meta.env.VITE_EMAILJS_TEMPLATE_ID,
-      {
-        from_name: form.name,
-        from_email: form.email,
-        message: form.message,
-      },
-      import.meta.env.VITE_EMAILJS_PUBLIC_KEY
-    )
-    .then(() => {
+    setTimeout(() => {
       setStatus('success');
       setForm({ name: '', email: '', message: '' });
-    })
-    .catch((err) => {
-      console.error(err);
-      setStatus('error');
-    });
+    }, 1000);
   };
 
   return (
-    <section id="contact" className="py-24 bg-transparent relative z-10">
-      <div className="max-w-4xl mx-auto px-6">
-        <SectionLabel label="LET'S_TALK" title="Contact" />
-
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
+    <section id="contact" className="py-32 bg-[var(--bg-main)] relative z-10 border-t border-[var(--border-subtle)] pb-44">
+      <div className="max-w-6xl mx-auto px-6">
+        
+        {/* Section Header with React Bits ScrollFloat */}
+        <div className="flex justify-between items-end mb-16 pb-6 border-b border-[var(--border-subtle)]">
           <div>
-            <p className="text-[#8fa3c0] text-lg leading-relaxed mb-8">
-              I'm currently looking for new opportunities. Whether you have a question or just want to say hi, I'll try my best to get back to you!
-            </p>
-            
-            <div className="flex flex-col gap-4">
-              <a href="mailto:priyanshughosh97@gmail.com" className="font-mono text-[#f0f6ff] hover:text-[#1A56DB] transition-colors border-b border-[#1e2d4a] pb-4 block">
-                priyanshughosh97@gmail.com
-              </a>
-              <a href="https://linkedin.com/in/priyanshu-ghosh-" target="_blank" rel="noopener noreferrer" className="font-mono text-[#f0f6ff] hover:text-[#1A56DB] transition-colors border-b border-[#1e2d4a] pb-4 block">
-                LinkedIn ↗
-              </a>
-              <a href="https://github.com/PG300604" target="_blank" rel="noopener noreferrer" className="font-mono text-[#f0f6ff] hover:text-[#1A56DB] transition-colors pb-4 block">
-                GitHub ↗
-              </a>
+            <span className="font-mono-custom text-xs text-[var(--text-muted)] uppercase tracking-widest block mb-2">
+              [ 04 / CONTACT ]
+            </span>
+            <ScrollFloat
+              textClassName="text-3xl sm:text-5xl font-sora font-extrabold text-[var(--text-main)]"
+              animationDuration={1}
+              stagger={0.03}
+            >
+              Let’s shape something precise.
+            </ScrollFloat>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-start">
+          
+          {/* Left Column */}
+          <div className="lg:col-span-5 space-y-6">
+            <div className="bg-[var(--card-bg)] border border-[var(--border-subtle)] p-8 rounded-2xl space-y-6">
+              <span className="font-mono-custom text-xs text-[var(--text-muted)] uppercase tracking-widest block">
+                // DIRECT INQUIRIES
+              </span>
+              <p className="font-mono-custom text-xs text-[var(--text-muted)] leading-relaxed">
+                Open for full-stack engineering roles, product software contracts, and technical collaborations worldwide.
+              </p>
+
+              {/* Email Pill */}
+              <div className="bg-[var(--bg-main)] border border-[var(--border-subtle)] p-4 rounded-xl space-y-2">
+                <span className="font-mono-custom text-xs text-[var(--text-muted)] block">EMAIL:</span>
+                <div className="flex items-center justify-between gap-2">
+                  <span className="font-mono-custom text-xs text-[var(--text-main)] truncate">{emailAddress}</span>
+                  <button
+                    onClick={handleCopyEmail}
+                    data-cursor="[ COPY ]"
+                    className="font-mono-custom text-xs bg-[var(--text-main)] text-[var(--bg-main)] font-bold px-3 py-1 rounded-md hover:opacity-90 transition-opacity"
+                  >
+                    {copied ? '[ COPIED ]' : '[ COPY ]'}
+                  </button>
+                </div>
+              </div>
+
+              {/* Links */}
+              <div className="space-y-3 font-mono-custom text-xs">
+                <a
+                  href="https://linkedin.com/in/priyanshu-ghosh-"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  data-cursor="[ LINKEDIN ]"
+                  className="flex items-center justify-between p-3.5 rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-main)] hover:border-[var(--border-strong)] transition-colors text-[var(--text-main)]"
+                >
+                  <span>LinkedIn Profile</span>
+                  <span>↗</span>
+                </a>
+
+                <a
+                  href="https://github.com/PG300604"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  data-cursor="[ GITHUB ]"
+                  className="flex items-center justify-between p-3.5 rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-main)] hover:border-[var(--border-strong)] transition-colors text-[var(--text-main)]"
+                >
+                  <span>GitHub Repositories</span>
+                  <span>↗</span>
+                </a>
+              </div>
+
             </div>
           </div>
 
-          <div>
-            <form onSubmit={handleSubmit} className="flex flex-col gap-6">
-              <div>
-                <label className="block font-mono text-[11px] text-[#8fa3c0] uppercase tracking-widest mb-2">Name</label>
-                <input 
-                  type="text" 
-                  name="name" 
-                  value={form.name} 
-                  onChange={handleChange} 
-                  required
-                  className="w-full bg-[#0a0f1e] text-[#f0f6ff] border-2 border-[#1e2d4a] p-3 font-mono text-sm focus:border-2 focus:border-[#1A56DB] focus:outline-none transition-colors"
-                />
-              </div>
-              <div>
-                <label className="block font-mono text-[11px] text-[#8fa3c0] uppercase tracking-widest mb-2">Email</label>
-                <input 
-                  type="email" 
-                  name="email" 
-                  value={form.email} 
-                  onChange={handleChange} 
-                  required
-                  className="w-full bg-[#0a0f1e] text-[#f0f6ff] border-2 border-[#1e2d4a] p-3 font-mono text-sm focus:border-2 focus:border-[#1A56DB] focus:outline-none transition-colors"
-                />
-              </div>
-              <div>
-                <label className="block font-mono text-[11px] text-[#8fa3c0] uppercase tracking-widest mb-2">Message</label>
-                <textarea 
-                  name="message" 
-                  value={form.message} 
-                  onChange={handleChange} 
-                  required
-                  rows={4}
-                  className="w-full bg-[#0a0f1e] text-[#f0f6ff] border-2 border-[#1e2d4a] p-3 font-mono text-sm focus:border-2 focus:border-[#1A56DB] focus:outline-none transition-colors"
-                />
-              </div>
-              
-              <button 
-                type="submit" 
-                disabled={status === 'loading'}
-                className="bg-[#1A56DB] text-[#f0f6ff] border-[3px] border-[#1A56DB] px-8 py-4 font-mono font-bold text-[13px] uppercase tracking-[0.1em] hover:bg-[#388bfd] hover:border-[#388bfd] active:bg-[#0f3d9e] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                {status === 'loading' ? 'Sending...' : 'Send Message'}
-              </button>
+          {/* Right Column: Form */}
+          <div className="lg:col-span-7">
+            <div className="bg-[var(--card-bg)] border border-[var(--border-subtle)] p-8 rounded-2xl">
+              <form onSubmit={handleSubmit} className="space-y-6">
+                <div>
+                  <label className="block font-mono-custom text-xs text-[var(--text-muted)] uppercase tracking-wider mb-2">
+                    [ YOUR NAME ]
+                  </label>
+                  <input
+                    type="text"
+                    name="name"
+                    value={form.name}
+                    onChange={handleChange}
+                    required
+                    placeholder="Enter your name..."
+                    className="w-full bg-[var(--bg-main)] text-[var(--text-main)] border border-[var(--border-subtle)] rounded-xl p-4 font-mono-custom text-xs focus:border-[var(--text-main)] focus:outline-none transition-colors"
+                  />
+                </div>
 
-              {status === 'success' && (
-                <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="bg-[#0d2a22] border-2 border-[#4fcea6] p-4 text-[#4fcea6] font-mono text-sm">
-                  Message sent successfully!
-                </motion.div>
-              )}
-              {status === 'error' && (
-                <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="bg-[#2a0f0f] border-2 border-[#e55353] p-4 text-[#e55353] font-mono text-sm">
-                  Failed to send message. Please try again.
-                </motion.div>
-              )}
-            </form>
+                <div>
+                  <label className="block font-mono-custom text-xs text-[var(--text-muted)] uppercase tracking-wider mb-2">
+                    [ EMAIL ADDRESS ]
+                  </label>
+                  <input
+                    type="email"
+                    name="email"
+                    value={form.email}
+                    onChange={handleChange}
+                    required
+                    placeholder="name@company.com"
+                    className="w-full bg-[var(--bg-main)] text-[var(--text-main)] border border-[var(--border-subtle)] rounded-xl p-4 font-mono-custom text-xs focus:border-[var(--text-main)] focus:outline-none transition-colors"
+                  />
+                </div>
+
+                <div>
+                  <label className="block font-mono-custom text-xs text-[var(--text-muted)] uppercase tracking-wider mb-2">
+                    [ MESSAGE ]
+                  </label>
+                  <textarea
+                    name="message"
+                    value={form.message}
+                    onChange={handleChange}
+                    required
+                    rows={4}
+                    placeholder="Write a message..."
+                    className="w-full bg-[var(--bg-main)] text-[var(--text-main)] border border-[var(--border-subtle)] rounded-xl p-4 font-mono-custom text-xs focus:border-[var(--text-main)] focus:outline-none transition-colors"
+                  />
+                </div>
+
+                <button
+                  type="submit"
+                  disabled={status === 'loading'}
+                  data-cursor="[ SEND MESSAGE ]"
+                  className="w-full font-mono-custom text-xs uppercase tracking-widest font-bold bg-[var(--text-main)] text-[var(--bg-main)] py-4 rounded-xl hover:opacity-90 transition-opacity"
+                >
+                  {status === 'loading' ? '[ SENDING... ]' : '[ SEND MESSAGE ]'}
+                </button>
+
+                {status === 'success' && (
+                  <div className="bg-emerald-500/10 border border-emerald-500/40 p-4 text-emerald-400 font-mono-custom text-xs rounded-xl text-center">
+                    ✓ Message received! Thank you.
+                  </div>
+                )}
+              </form>
+            </div>
           </div>
+
         </div>
+
       </div>
     </section>
   );

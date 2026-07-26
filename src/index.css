@@ -1,46 +1,70 @@
 @import "tailwindcss";
 
-@theme {
-  --color-brand-bg: #0a0f1e;
-  --color-brand-surface: #0d1525;
-  --color-brand-surface-raised: #111d35;
-  --color-brand-border-muted: #1e2d4a;
-  --color-brand-border-default: #1A56DB;
-  --color-brand-border-strong: #388bfd;
-  
-  --color-brand-text-primary: #f0f6ff;
-  --color-brand-text-secondary: #8fa3c0;
-  --color-brand-text-muted: #4a6080;
-  
-  --color-brand-accent-blue: #1A56DB;
-  --color-brand-accent-blue-bright: #388bfd;
-  --color-brand-accent-green: #4fcea6;
-  --color-brand-accent-green-muted: #1a4a3a;
-
-  --color-brand-success: #4fcea6;
-  --color-brand-warning: #e5a823;
-  --color-brand-error: #e55353;
-  --color-brand-info: #388bfd;
-
-  --font-sora: "Sora", sans-serif;
-  --font-mono: "JetBrains Mono", monospace;
-}
-
 @layer base {
-  body {
-    background-color: var(--color-brand-bg);
-    color: var(--color-brand-text-primary);
-    font-family: var(--font-sora);
+  :root {
+    --bg-main: #121212;
+    --text-main: #f4f3ef;
+    --text-muted: #888888;
+    --border-subtle: #262626;
+    --border-strong: #444444;
+    --accent: #f4f3ef;
+    --card-bg: #181818;
+    --hover-bg: #222222;
+    --accent-glow: #388bfd;
+  }
+
+  [data-theme="cream"] {
+    --bg-main: #f5f4ef;
+    --text-main: #141413;
+    --text-muted: #6e6d68;
+    --border-subtle: #e3e1d7;
+    --border-strong: #bcbaa9;
+    --accent: #141413;
+    --card-bg: #e8e6dc;
+    --hover-bg: #dfdcd0;
+    --accent-glow: #141413;
   }
 }
 
-/* Base styles to enforce no border radius and other rules */
-* {
-  border-radius: 0 !important;
-  box-shadow: none !important;
+html {
+  scroll-behavior: smooth;
+  background-color: var(--bg-main);
+  color: var(--text-main);
 }
 
-/* Allow border radius for profile images */
-.profile-img {
-  border-radius: 50% !important;
+body {
+  background-color: var(--bg-main);
+  color: var(--text-main);
+  font-family: "Sora", sans-serif;
+  overflow-x: hidden;
+  transition: background-color 0.4s ease, color 0.4s ease;
+  cursor: default;
+}
+
+/* Custom Jordi Garreta Scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--bg-main);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--border-strong);
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--text-main);
+}
+
+/* Selection Color */
+::selection {
+  background: var(--text-main);
+  color: var(--bg-main);
+}
+
+.font-mono-custom {
+  font-family: "JetBrains Mono", monospace;
 }
