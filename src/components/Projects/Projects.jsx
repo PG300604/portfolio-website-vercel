@@ -128,10 +128,10 @@ export default function Projects() {
             <FlyingPosters
               ref={postersRef}
               items={posterItems}
-              planeWidth={560}
-              planeHeight={560}
-              distortion={3}
-              scrollEase={0.08}
+              planeWidth={620}
+              planeHeight={420}
+              distortion={4}
+              scrollEase={0.06}
               onItemClick={handlePosterClick}
             />
           </div>

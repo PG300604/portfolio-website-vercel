@@ -17,6 +17,7 @@ uniform mat3 normalMatrix;
 uniform float uPosition;
 uniform float uTime;
 uniform float uSpeed;
+uniform float uScrollSpeed;
 uniform vec3 distortionAxis;
 uniform vec3 rotationAxis;
 uniform float uDistortion;
@@ -53,16 +54,20 @@ float qinticInOut(float t) {
 void main() {
   vUv = uv;
   
+  // Blend distortion based on scroll speed — flat at rest, warped when dragging
+  float speedFactor = clamp(abs(uScrollSpeed) * 12.0, 0.0, 1.0);
+  float activeDistortion = uDistortion * speedFactor;
+
   float norm = 0.5;
   vec3 newpos = position;
   float offset = (dot(distortionAxis, position) + norm / 2.) / norm;
   float localprogress = clamp(
-    (fract(uPosition * 5.0 * 0.01) - 0.01 * uDistortion * offset) / (1. - 0.01 * uDistortion),
+    (fract(uPosition * 5.0 * 0.01) - 0.01 * activeDistortion * offset) / (1. - 0.01 * activeDistortion),
     0.,
     2.
   );
   localprogress = qinticInOut(localprogress) * PI;
-  newpos = rotate(newpos, rotationAxis, localprogress);
+  newpos = rotate(newpos, rotationAxis, localprogress * speedFactor);
 
   gl_Position = projectionMatrix * modelViewMatrix * vec4(newpos, 1.0);
 }
@@ -136,7 +141,7 @@ function map(num, min1, max1, min2, max2, round = false) {
   return round ? Math.round(num2) : num2;
 }
 
-class Media {
+class MediaItem {
   constructor({ gl, geometry, scene, screen, viewport, image, length, index, planeWidth, planeHeight, distortion }) {
     this.extra = 0;
     this.gl = gl;
@@ -172,6 +177,7 @@ class Media {
         uPlaneSize: { value: [0, 0] },
         uImageSize: { value: [0, 0] },
         uSpeed: { value: 0 },
+        uScrollSpeed: { value: 0 },
         rotationAxis: { value: [0, 1, 0] },
         distortionAxis: { value: [1, 1, 0] },
         uDistortion: { value: this.distortion },
@@ -214,14 +220,14 @@ class Media {
     }
     this.setScale();
 
-    this.padding = 5;
+    this.padding = 2;
     this.height = this.plane.scale.y + this.padding;
     this.heightTotal = this.height * this.length;
 
     this.y = -this.heightTotal / 2 + (this.index + 0.5) * this.height;
   }
 
-  update(scroll) {
+  update(scroll, scrollSpeed) {
     this.plane.position.y = this.y - scroll.current - this.extra;
 
     const position = map(this.plane.position.y, -this.viewport.height, this.viewport.height, 5, 15);
@@ -229,6 +235,7 @@ class Media {
     this.program.uniforms.uPosition.value = position;
     this.program.uniforms.uTime.value += 0.04;
     this.program.uniforms.uSpeed.value = scroll.current;
+    this.program.uniforms.uScrollSpeed.value = scrollSpeed;
 
     const planeHeight = this.plane.scale.y;
     const viewportHeight = this.viewport.height;
@@ -259,6 +266,7 @@ class Canvas {
       target: 0,
       last: 0
     };
+    this.scrollSpeed = 0;
     this.cameraFov = cameraFov;
     this.cameraZ = cameraZ;
 
@@ -305,7 +313,7 @@ class Canvas {
 
   createMedias() {
     this.medias = this.items.map((image, index) => {
-      return new Media({
+      return new MediaItem({
         gl: this.gl,
         geometry: this.planeGeometry,
         scene: this.scene,
@@ -414,8 +422,11 @@ class Canvas {
   update() {
     this.scroll.current = lerp(this.scroll.current, this.scroll.target, this.scroll.ease);
 
+    // Calculate instantaneous scroll speed for distortion blending
+    this.scrollSpeed = lerp(this.scrollSpeed, Math.abs(this.scroll.current - this.scroll.last) , 0.1);
+
     if (this.medias) {
-      this.medias.forEach(media => media.update(this.scroll));
+      this.medias.forEach(media => media.update(this.scroll, this.scrollSpeed));
     }
     this.renderer.render({ scene: this.scene, camera: this.camera });
     this.scroll.last = this.scroll.current;
