@@ -1,4 +1,4 @@
-import { Link, useNavigate } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
 import { useGitHubData } from '../hooks/useGitHubData';
 import { FolderKanban, Award, ShieldCheck, ExternalLink, LogOut, Code, Layers, FileText, Settings, Eye, Clock, Image, BookOpen } from 'lucide-react';
