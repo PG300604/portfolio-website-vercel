@@ -10,23 +10,40 @@ export default function Timeline() {
   const defaultTimeline = [
     {
       id: 't1',
-      year: '2024 — PRESENT',
-      title: 'Full-Stack Developer & CS Undergrad',
-      org: 'Techno Main Salt Lake',
-      desc: 'Architecting distributed Java microservices, Spring Boot backends, and responsive React web applications.',
+      year: '2023 — 2027',
+      title: 'B.Tech in Computer Science & Business Systems',
+      org: 'Asansol Engineering College',
+      desc: 'Focused on Full Stack Development, Java Spring Boot Microservices, DSA, and System Design.',
       active: true
     },
     {
       id: 't2',
-      year: '2023 — 2024',
-      title: 'Systems & Data Structures Practice',
-      org: 'Independent Engineering',
-      desc: 'Mastering algorithm design, concurrency models, and object-oriented architecture principles.',
+      year: '2018 — 2023',
+      title: 'Secondary (10th) & Sr. Secondary (12th)',
+      org: 'Carmel Convent School — Giridih',
+      desc: 'Completed secondary and higher secondary education with distinction in Science & Mathematics.',
+      active: false
+    },
+    {
+      id: 't3',
+      year: '2008 — 2018',
+      title: 'Primary & Middle School',
+      org: 'Carmel Convent School — Giridih',
+      desc: 'Completed elementary education under ICSE background, building foundational communication and analytical skills.',
       active: false
     }
   ];
 
-  const timeline = timelineData || defaultTimeline;
+  const rawTimeline = timelineData || defaultTimeline;
+
+  // Sort timeline chronologically in reverse (most recent first)
+  const timeline = [...rawTimeline].sort((a, b) => {
+    const getStartYear = (str) => {
+      const match = (str || '').match(/\d{4}/);
+      return match ? parseInt(match[0], 10) : 0;
+    };
+    return getStartYear(b.year) - getStartYear(a.year);
+  });
 
   return (
     <section id="experience" className="py-32 bg-[var(--bg-main)] relative z-10 border-t border-[var(--border-subtle)]">
@@ -39,7 +56,7 @@ export default function Timeline() {
               [ JOURNEY & TIMELINE ]
             </span>
             <h2 className="text-3xl sm:text-5xl font-sora font-extrabold text-[var(--text-main)]">
-              Experience & History
+              Experience & Academic History
             </h2>
           </div>
         </div>
@@ -57,13 +74,14 @@ export default function Timeline() {
             >
               {/* Node Indicator */}
               <div className="absolute -left-[31px] top-1.5 w-3.5 h-3.5 rounded-full bg-[var(--bg-main)] border-2 border-[var(--text-main)] flex items-center justify-center">
-                {item.active && <div className="w-1.5 h-1.5 rounded-full bg-emerald-400" />}
+                {item.active && <div className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping" />}
               </div>
 
-              <div className="bg-[var(--card-bg)] border border-[var(--border-subtle)] hover:border-[var(--border-strong)] p-8 rounded-2xl transition-all">
-                <span className="font-mono-custom text-xs text-[var(--text-muted)] block mb-2">
-                  [{item.year}]
-                </span>
+              <div className="bg-[var(--card-bg)] border border-[var(--border-subtle)] hover:border-[var(--border-strong)] p-8 rounded-2xl transition-all shadow-xl">
+                <div className="flex items-center justify-between font-mono-custom text-xs text-[var(--text-muted)] mb-2">
+                  <span>[{item.year}]</span>
+                  {item.active && <span className="text-emerald-400 font-bold">[ PRESENT ]</span>}
+                </div>
                 <h3 className="text-xl font-sora font-bold text-[var(--text-main)] mb-1">
                   {item.title}
                 </h3>

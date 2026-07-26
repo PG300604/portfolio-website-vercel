@@ -56,7 +56,7 @@ export default function TechStack() {
     { node: <SiGit />, title: "Git", href: "https://git-scm.com" },
   ];
 
-  const skills = skillsData || defaultSkills;
+  const skills = (skillsData && skillsData.length >= 6) ? skillsData : defaultSkills;
   const categories = [...new Set(skills.map(s => s.category))];
 
   const categoryIcons = {
@@ -86,28 +86,27 @@ export default function TechStack() {
             </ScrollFloat>
           </div>
           <span className="font-mono-custom text-xs text-[var(--text-muted)] uppercase">
-            [ 3D CARDS SWAP • HOVER OR CLICK TO EXPLORE ]
+            [ 3D CARDS SWAP • HOVER OR CLICK CARD TO SWAP ]
           </span>
         </div>
 
         {/* React Bits CardSwap 3D Interactive Card Stack Stage */}
-        <div className="h-[540px] w-full relative flex items-center justify-center mb-16 overflow-visible">
+        <div className="h-[520px] w-full relative flex flex-col items-center justify-center mb-12 overflow-visible">
           <CardSwap
             width={540}
             height={340}
             cardDistance={32}
             verticalDistance={36}
-            delay={4000}
+            delay={3500}
             pauseOnHover={true}
             skewAmount={2}
-            easing="elastic"
           >
             {categories.map((category, idx) => {
               const catSkills = skills.filter(s => s.category === category);
               return (
                 <Card 
                   key={category}
-                  customClass="p-8 flex flex-col justify-between border border-[var(--border-subtle)] bg-[var(--card-bg)]/95 shadow-2xl backdrop-blur-2xl transition-all hover:border-[var(--border-strong)]"
+                  customClass="p-8 flex flex-col justify-between border border-[var(--border-subtle)] bg-[var(--card-bg)]/95 shadow-2xl backdrop-blur-2xl transition-all hover:border-[var(--border-strong)] cursor-pointer"
                 >
                   <div>
                     {/* Card Header */}
@@ -120,7 +119,7 @@ export default function TechStack() {
                     </div>
 
                     {/* Category Title */}
-                    <h3 className="font-sora text-2xl font-extrabold text-[var(--text-main)] mb-5">
+                    <h3 className="font-sora text-2xl font-extrabold text-[var(--text-main)] mb-5 uppercase tracking-wide">
                       {category}
                     </h3>
 
@@ -140,8 +139,8 @@ export default function TechStack() {
 
                   {/* Card Footer */}
                   <div className="pt-4 border-t border-[var(--border-subtle)] flex items-center justify-between font-mono-custom text-xs text-[var(--text-muted)]">
-                    <span>STATUS: OPERATIONAL</span>
-                    <span className="text-[var(--text-main)] font-bold">↗</span>
+                    <span>CLICK CARD TO SWAP</span>
+                    <span className="text-[var(--text-main)] font-bold">CLICK ↗</span>
                   </div>
                 </Card>
               );
