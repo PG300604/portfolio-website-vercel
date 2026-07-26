@@ -910,7 +910,7 @@ const defaultItems = [
   }
 ];
 
-export default function InfiniteMenu({ items = [], scale = 1.0 }) {
+export default function InfiniteMenu({ items = [], scale = 1.0, onSelect }) {
   const canvasRef = useRef(null);
   const [activeItem, setActiveItem] = useState(null);
   const [isMoving, setIsMoving] = useState(false);
@@ -950,10 +950,14 @@ export default function InfiniteMenu({ items = [], scale = 1.0 }) {
   }, [items, scale]);
 
   const handleButtonClick = () => {
-    if (!activeItem?.link) return;
-    if (activeItem.link.startsWith('http')) {
+    if (!activeItem) return;
+    if (onSelect) {
+      onSelect(activeItem);
+      return;
+    }
+    if (activeItem.link && activeItem.link.startsWith('http')) {
       window.open(activeItem.link, '_blank');
-    } else {
+    } else if (activeItem.link) {
       window.location.hash = activeItem.link;
     }
   };

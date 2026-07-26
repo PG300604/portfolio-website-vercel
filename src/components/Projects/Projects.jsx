@@ -97,6 +97,13 @@ export default function Projects({ viewMode = 'list' }) {
     }
   };
 
+  const handleInfiniteSelect = (item) => {
+    const proj = visibleProjects.find(p => p.title === item.title);
+    if (proj) {
+      setSelectedProject(proj);
+    }
+  };
+
   return (
     <section id="projects" className="py-16 sm:py-32 bg-[var(--bg-main)] relative z-10 border-t border-[var(--border-subtle)]">
       <div className="max-w-7xl mx-auto px-4 sm:px-6">
@@ -120,7 +127,7 @@ export default function Projects({ viewMode = 'list' }) {
         {/* GALLERY MODE: React Bits 3D InfiniteMenu Sphere Grid */}
         {viewMode === 'gallery' ? (
           <div className="h-[520px] sm:h-[650px] w-full relative rounded-2xl sm:rounded-3xl overflow-hidden border border-[var(--border-subtle)] bg-[var(--card-bg)]/80 backdrop-blur-xl shadow-2xl">
-            <InfiniteMenu items={infiniteMenuItems} scale={1.1} />
+            <InfiniteMenu items={infiniteMenuItems} scale={1.1} onSelect={handleInfiniteSelect} />
           </div>
         ) : (
           /* LIST MODE (DEFAULT): 3D FLYING POSTERS STAGE */
