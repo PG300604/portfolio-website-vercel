@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { useGitHubData } from '../hooks/useGitHubData';
 import { writeGitHubData } from '../hooks/useGitHubWrite';
 import ImageUploader from '../components/shared/ImageUploader';
+import { Plus, Trash2, Edit3, ArrowLeft, Check, Sparkles, Image as ImageIcon } from 'lucide-react';
 
 export default function ProjectsAdmin() {
   const { data: initialProjects, loading: dataLoading, error: fetchError } = useGitHubData('projects.json');
@@ -23,10 +24,10 @@ export default function ProjectsAdmin() {
       title: 'New Project',
       description: 'Project description...',
       longDescription: '',
-      stack: ['React', 'Tailwind'],
+      stack: ['React', 'TailwindCSS'],
       liveUrl: '',
       githubUrl: '',
-      imageUrl: '',
+      imageUrl: '/Homepage.png',
       featured: false,
       visible: true
     };
@@ -60,31 +61,39 @@ export default function ProjectsAdmin() {
     }
   };
 
-  if (dataLoading) return <div className="p-8 text-[#f0f6ff] bg-[#060a14] min-h-screen">Loading projects...</div>;
-  if (fetchError) return <div className="p-8 text-[#e55353] bg-[#060a14] min-h-screen">Error loading: {fetchError.message}</div>;
+  if (dataLoading) return <div className="p-8 text-[var(--text-main)] bg-[var(--bg-main)] min-h-screen font-mono-custom text-xs">Loading projects data...</div>;
+  if (fetchError) return <div className="p-8 text-red-400 bg-[var(--bg-main)] min-h-screen font-mono-custom text-xs">Error loading data: {fetchError.message}</div>;
 
   return (
-    <div className="min-h-screen bg-[#060a14] p-8 text-[#f0f6ff]">
-      <div className="max-w-6xl mx-auto">
-        <div className="flex justify-between items-center mb-8 border-b-2 border-[#1e2d4a] pb-6">
+    <div className="min-h-screen bg-[var(--bg-main)] p-8 text-[var(--text-main)] font-sora">
+      <div className="max-w-6xl mx-auto space-y-8">
+        
+        {/* Header Bar */}
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center pb-6 border-b border-[var(--border-subtle)] gap-4">
           <div>
-            <div className="font-mono text-[11px] text-[#4fcea6] uppercase tracking-widest mb-2">
-              <Link to="/admin/dashboard" className="text-[#8fa3c0] hover:text-[#388bfd]">Dashboard</Link> / PROJECTS
+            <div className="font-mono-custom text-xs text-[var(--text-muted)] uppercase tracking-widest mb-2 flex items-center gap-2">
+              <Link to="/admin/dashboard" className="text-[var(--text-muted)] hover:text-[var(--text-main)] flex items-center gap-1">
+                <ArrowLeft className="w-3.5 h-3.5" /> Dashboard
+              </Link> 
+              <span>/</span> 
+              <span className="text-[var(--text-main)] font-bold">PROJECTS</span>
             </div>
-            <h1 className="text-3xl font-sora font-bold">Manage Projects</h1>
+            <h1 className="text-3xl font-extrabold tracking-tight">Manage Floating Projects</h1>
           </div>
+
           <button
             onClick={handleAdd}
-            className="bg-[#1A56DB] text-[#f0f6ff] border-[3px] border-[#1A56DB] px-5 py-2 font-mono font-bold text-[12px] uppercase tracking-[0.1em] hover:bg-[#388bfd] hover:border-[#388bfd] transition-colors rounded-none"
+            className="bg-[var(--text-main)] text-[var(--bg-main)] font-mono-custom text-xs font-bold uppercase tracking-wider px-6 py-3 rounded-full hover:opacity-90 transition-all flex items-center gap-2 shadow-xl"
           >
-            + Add Project
+            <Plus className="w-4 h-4" /> Add New Project
           </button>
         </div>
 
-        {error && <div className="bg-[#2a0f0f] border-2 border-[#e55353] p-4 mb-6 text-[#e55353] font-mono text-sm">{error}</div>}
-        {saving && <div className="bg-[#0d2a22] border-2 border-[#4fcea6] p-4 mb-6 text-[#4fcea6] font-mono text-sm">Saving to GitHub...</div>}
+        {error && <div className="bg-red-500/10 border border-red-500/30 p-4 rounded-xl text-red-400 font-mono-custom text-xs">{error}</div>}
+        {saving && <div className="bg-emerald-500/10 border border-emerald-500/30 p-4 rounded-xl text-emerald-400 font-mono-custom text-xs">[ SAVING TO GITHUB BACKEND... ]</div>}
 
-        <div className="grid grid-cols-1 gap-6">
+        {/* Project List */}
+        <div className="space-y-6">
           {projects.map((project) => (
             editingId === project.id ? (
               <ProjectEditor 
@@ -93,42 +102,72 @@ export default function ProjectsAdmin() {
                 onSave={handleSave} 
                 onCancel={() => {
                   setEditingId(null);
-                  if (project.title === 'New Project' && project.liveUrl === '') {
+                  if (project.title === 'New Project' && !project.liveUrl) {
                     setProjects(projects.filter(p => p.id !== project.id));
                   }
                 }} 
               />
             ) : (
-              <div key={project.id} className={`bg-[#0d1525] border-2 ${project.featured ? 'border-[#388bfd] border-t-[4px] border-t-[#4fcea6]' : 'border-[#1A56DB] border-t-[4px] border-t-[#1A56DB]'} p-6 flex flex-col md:flex-row justify-between items-start md:items-center gap-4`}>
-                <div>
-                  <div className="flex items-center gap-3 mb-2">
-                    <h3 className="text-xl font-sora font-bold">{project.title}</h3>
-                    {project.featured && <span className="bg-[#0d2a22] text-[#4fcea6] border border-[#4fcea6] text-[10px] uppercase font-mono px-2 py-0.5">Featured</span>}
-                    {!project.visible && <span className="bg-[#2a1f0a] text-[#e5a823] border border-[#e5a823] text-[10px] uppercase font-mono px-2 py-0.5">Hidden</span>}
+              <div key={project.id} className="bg-[var(--card-bg)] border border-[var(--border-subtle)] hover:border-[var(--border-strong)] p-6 rounded-2xl flex flex-col md:flex-row justify-between items-start md:items-center gap-6 shadow-xl transition-all">
+                <div className="flex items-center gap-5">
+                  {/* Floating Card Image Thumbnail Preview */}
+                  <div className="w-24 h-20 rounded-xl overflow-hidden bg-[var(--bg-main)] border border-[var(--border-subtle)] shrink-0 flex items-center justify-center relative group">
+                    <img 
+                      src={project.imageUrl || project.image || '/Homepage.png'} 
+                      alt={project.title} 
+                      className="w-full h-full object-cover"
+                      onError={(e) => e.target.src = '/Homepage.png'}
+                    />
+                    <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                      <ImageIcon className="w-5 h-5 text-white" />
+                    </div>
                   </div>
-                  <p className="text-[#8fa3c0] text-sm mb-3 line-clamp-1">{project.description}</p>
-                  <div className="flex flex-wrap gap-2">
-                    {project.stack.map(tech => (
-                      <span key={tech} className="text-[#79b8ff] border border-[#1A56DB] font-mono text-[10px] px-2 py-0.5">{tech}</span>
-                    ))}
+
+                  <div>
+                    <div className="flex items-center gap-3 mb-2">
+                      <h3 className="text-xl font-bold">{project.title}</h3>
+                      {project.featured && <span className="bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 text-[10px] uppercase font-mono-custom px-2.5 py-0.5 rounded-full">[ FEATURED ]</span>}
+                      {!project.visible && <span className="bg-amber-500/10 text-amber-400 border border-amber-500/30 text-[10px] uppercase font-mono-custom px-2.5 py-0.5 rounded-full">[ HIDDEN ]</span>}
+                    </div>
+                    <p className="text-[var(--text-muted)] font-mono-custom text-xs mb-3 line-clamp-1">{project.description}</p>
+                    <div className="flex flex-wrap gap-2 font-mono-custom text-[11px]">
+                      {(project.stack || []).map(tech => (
+                        <span key={tech} className="bg-[var(--bg-main)] text-[var(--text-main)] border border-[var(--border-subtle)] px-2.5 py-0.5 rounded-md">{tech}</span>
+                      ))}
+                    </div>
                   </div>
                 </div>
-                <div className="flex gap-3">
-                  <button onClick={() => setEditingId(project.id)} className="bg-transparent border-2 border-[#1A56DB] text-[#f0f6ff] font-mono uppercase text-[11px] px-4 py-2 hover:bg-[#1A56DB]">Edit</button>
-                  <button onClick={() => handleDelete(project.id)} className="bg-transparent border-2 border-[#e55353] text-[#e55353] font-mono uppercase text-[11px] px-4 py-2 hover:bg-[#e55353] hover:text-[#f0f6ff]">Delete</button>
+
+                <div className="flex items-center gap-3 font-mono-custom text-xs">
+                  <button onClick={() => setEditingId(project.id)} className="bg-[var(--bg-main)] border border-[var(--border-subtle)] hover:border-[var(--text-main)] text-[var(--text-main)] px-4 py-2 rounded-full font-bold transition-all flex items-center gap-1.5">
+                    <Edit3 className="w-3.5 h-3.5" /> Edit
+                  </button>
+                  <button onClick={() => handleDelete(project.id)} className="bg-red-500/10 border border-red-500/30 text-red-400 px-4 py-2 rounded-full font-bold transition-all hover:bg-red-500/20 flex items-center gap-1.5">
+                    <Trash2 className="w-3.5 h-3.5" /> Delete
+                  </button>
                 </div>
               </div>
             )
           ))}
-          {projects.length === 0 && <div className="text-center text-[#8fa3c0] py-12 border-2 border-dashed border-[#1e2d4a]">No projects found. Add one above.</div>}
+
+          {projects.length === 0 && (
+            <div className="text-center text-[var(--text-muted)] py-16 border border-dashed border-[var(--border-subtle)] rounded-2xl font-mono-custom text-xs">
+              No projects found. Click "+ Add New Project" to create one.
+            </div>
+          )}
         </div>
+
       </div>
     </div>
   );
 }
 
 function ProjectEditor({ project, onSave, onCancel }) {
-  const [formData, setFormData] = useState({ ...project, stack: project.stack.join(', ') });
+  const [formData, setFormData] = useState({ 
+    ...project, 
+    imageUrl: project.imageUrl || project.image || '/Homepage.png',
+    stack: Array.isArray(project.stack) ? project.stack.join(', ') : (project.stack || '') 
+  });
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -142,81 +181,110 @@ function ProjectEditor({ project, onSave, onCancel }) {
     e.preventDefault();
     onSave({
       ...formData,
+      image: formData.imageUrl, // sync image & imageUrl for 3D FloatingPosters compatibility
       stack: formData.stack.split(',').map(s => s.trim()).filter(Boolean)
     });
   };
 
   return (
-    <div className="bg-[#0d1525] border-2 border-[#388bfd] p-6 border-t-[4px] border-t-[#388bfd]">
-      <h3 className="font-mono text-[13px] text-[#388bfd] uppercase tracking-widest mb-4">Edit Project</h3>
-      <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+    <div className="bg-[var(--card-bg)] border border-[var(--border-strong)] p-8 rounded-3xl space-y-6 shadow-2xl">
+      <div className="flex items-center justify-between border-b border-[var(--border-subtle)] pb-4">
+        <h3 className="font-mono-custom text-xs text-[var(--text-muted)] uppercase tracking-widest flex items-center gap-2">
+          <Sparkles className="w-4 h-4 text-[var(--text-main)]" /> Edit Floating 3D Project Card
+        </h3>
+        <span className="font-mono-custom text-xs text-[var(--text-muted)]">[ ID: {project.id} ]</span>
+      </div>
+
+      <form onSubmit={handleSubmit} className="space-y-5 font-mono-custom text-xs">
+        
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
           <div>
-            <label className="block font-mono text-[11px] text-[#8fa3c0] uppercase tracking-widest mb-1">Title</label>
-            <input name="title" value={formData.title} onChange={handleChange} required className="w-full bg-[#060a14] text-[#f0f6ff] border-2 border-[#1e2d4a] p-2 font-mono text-sm focus:border-[#1A56DB] focus:outline-none" />
+            <label className="block text-[var(--text-muted)] uppercase mb-1">Project Title</label>
+            <input name="title" value={formData.title} onChange={handleChange} required className="w-full bg-[var(--bg-main)] text-[var(--text-main)] border border-[var(--border-subtle)] focus:border-[var(--text-main)] p-3 rounded-xl outline-none" />
           </div>
           <div>
-            <label className="block font-mono text-[11px] text-[#8fa3c0] uppercase tracking-widest mb-1">ID (Slug)</label>
-            <input name="id" value={formData.id} onChange={handleChange} required className="w-full bg-[#060a14] text-[#f0f6ff] border-2 border-[#1e2d4a] p-2 font-mono text-sm focus:border-[#1A56DB] focus:outline-none" />
+            <label className="block text-[var(--text-muted)] uppercase mb-1">Slug / Identifier</label>
+            <input name="id" value={formData.id} onChange={handleChange} required className="w-full bg-[var(--bg-main)] text-[var(--text-main)] border border-[var(--border-subtle)] focus:border-[var(--text-main)] p-3 rounded-xl outline-none" />
           </div>
         </div>
 
         <div>
-          <label className="block font-mono text-[11px] text-[#8fa3c0] uppercase tracking-widest mb-1">Short Description</label>
-          <textarea name="description" value={formData.description} onChange={handleChange} required rows={2} className="w-full bg-[#060a14] text-[#f0f6ff] border-2 border-[#1e2d4a] p-2 font-mono text-sm focus:border-[#1A56DB] focus:outline-none" />
+          <label className="block text-[var(--text-muted)] uppercase mb-1">Short Description</label>
+          <textarea name="description" value={formData.description} onChange={handleChange} required rows={2} className="w-full bg-[var(--bg-main)] text-[var(--text-main)] border border-[var(--border-subtle)] focus:border-[var(--text-main)] p-3 rounded-xl outline-none" />
         </div>
 
         <div>
-          <label className="block font-mono text-[11px] text-[#8fa3c0] uppercase tracking-widest mb-1">Long Description (Markdown/Details)</label>
-          <textarea name="longDescription" value={formData.longDescription || ''} onChange={handleChange} rows={5} className="w-full bg-[#060a14] text-[#f0f6ff] border-2 border-[#1e2d4a] p-2 font-mono text-sm focus:border-[#1A56DB] focus:outline-none" />
+          <label className="block text-[var(--text-muted)] uppercase mb-1">Detailed Description (Modal View)</label>
+          <textarea name="longDescription" value={formData.longDescription || ''} onChange={handleChange} rows={4} className="w-full bg-[var(--bg-main)] text-[var(--text-main)] border border-[var(--border-subtle)] focus:border-[var(--text-main)] p-3 rounded-xl outline-none" />
         </div>
 
         <div>
-          <label className="block font-mono text-[11px] text-[#8fa3c0] uppercase tracking-widest mb-1">Tech Stack (comma separated)</label>
-          <input name="stack" value={formData.stack} onChange={handleChange} className="w-full bg-[#060a14] text-[#f0f6ff] border-2 border-[#1e2d4a] p-2 font-mono text-sm focus:border-[#1A56DB] focus:outline-none" />
+          <label className="block text-[var(--text-muted)] uppercase mb-1">Tech Stack (Comma Separated)</label>
+          <input name="stack" value={formData.stack} onChange={handleChange} className="w-full bg-[var(--bg-main)] text-[var(--text-main)] border border-[var(--border-subtle)] focus:border-[var(--text-main)] p-3 rounded-xl outline-none" />
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        {/* Floating Card Project Image Upload & URL Section */}
+        <div className="p-5 bg-[var(--bg-main)] border border-[var(--border-subtle)] rounded-2xl space-y-4">
+          <div className="flex items-center justify-between">
+            <label className="text-[var(--text-main)] font-bold uppercase flex items-center gap-2">
+              <ImageIcon className="w-4 h-4 text-emerald-400" /> 3D Floating Poster Image Artwork
+            </label>
+            <span className="text-[10px] text-[var(--text-muted)]">[ APPEARS ON 3D STAGE & MODAL ]</span>
+          </div>
+
+          <div className="flex flex-col sm:flex-row gap-5 items-start sm:items-center">
+            {/* Image Preview */}
+            {formData.imageUrl && (
+              <div className="w-32 h-24 rounded-xl overflow-hidden border border-[var(--border-subtle)] shrink-0 bg-black">
+                <img src={formData.imageUrl} alt="Preview" className="w-full h-full object-cover" onError={(e) => e.target.src = '/Homepage.png'} />
+              </div>
+            )}
+
+            <div className="flex-1 space-y-3 w-full">
+              <ImageUploader 
+                onUploadSuccess={(url) => setFormData(prev => ({ ...prev, imageUrl: url, image: url }))} 
+              />
+              <input 
+                name="imageUrl" 
+                value={formData.imageUrl} 
+                onChange={(e) => {
+                  handleChange(e);
+                  setFormData(prev => ({ ...prev, image: e.target.value }));
+                }} 
+                placeholder="Or paste image URL (/Homepage.png or https://...)"
+                className="w-full bg-[var(--card-bg)] text-[var(--text-main)] border border-[var(--border-subtle)] focus:border-[var(--text-main)] p-3 rounded-xl outline-none" 
+              />
+            </div>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
-            <label className="block font-mono text-[11px] text-[#8fa3c0] uppercase tracking-widest mb-1">Live URL</label>
-            <input name="liveUrl" value={formData.liveUrl} onChange={handleChange} className="w-full bg-[#060a14] text-[#f0f6ff] border-2 border-[#1e2d4a] p-2 font-mono text-sm focus:border-[#1A56DB] focus:outline-none" />
+            <label className="block text-[var(--text-muted)] uppercase mb-1">Live Demo URL</label>
+            <input name="liveUrl" value={formData.liveUrl} onChange={handleChange} className="w-full bg-[var(--bg-main)] text-[var(--text-main)] border border-[var(--border-subtle)] focus:border-[var(--text-main)] p-3 rounded-xl outline-none" />
           </div>
           <div>
-            <label className="block font-mono text-[11px] text-[#8fa3c0] uppercase tracking-widest mb-1">GitHub URL</label>
-            <input name="githubUrl" value={formData.githubUrl} onChange={handleChange} className="w-full bg-[#060a14] text-[#f0f6ff] border-2 border-[#1e2d4a] p-2 font-mono text-sm focus:border-[#1A56DB] focus:outline-none" />
+            <label className="block text-[var(--text-muted)] uppercase mb-1">GitHub Repo URL</label>
+            <input name="githubUrl" value={formData.githubUrl} onChange={handleChange} className="w-full bg-[var(--bg-main)] text-[var(--text-main)] border border-[var(--border-subtle)] focus:border-[var(--text-main)] p-3 rounded-xl outline-none" />
           </div>
         </div>
 
-        <div>
-          <label className="block font-mono text-[11px] text-[#8fa3c0] uppercase tracking-widest mb-1">Project Image</label>
-          <div className="space-y-2">
-            <ImageUploader 
-              onUploadSuccess={(url) => setFormData(prev => ({ ...prev, imageUrl: url }))} 
-            />
-            <input 
-              name="imageUrl" 
-              value={formData.imageUrl} 
-              onChange={handleChange} 
-              placeholder="Or paste an image URL here..."
-              className="w-full bg-[#060a14] text-[#f0f6ff] border-2 border-[#1e2d4a] p-2 font-mono text-sm focus:border-[#1A56DB] focus:outline-none" 
-            />
-          </div>
-        </div>
-
-        <div className="flex gap-6 mt-2">
+        <div className="flex gap-6 pt-2">
           <label className="flex items-center gap-2 cursor-pointer">
-            <input type="checkbox" name="featured" checked={formData.featured} onChange={handleChange} className="w-4 h-4 accent-[#4fcea6]" />
-            <span className="font-mono text-sm text-[#f0f6ff]">Featured</span>
+            <input type="checkbox" name="featured" checked={formData.featured} onChange={handleChange} className="w-4 h-4 accent-emerald-400" />
+            <span className="text-[var(--text-main)]">Featured Project</span>
           </label>
           <label className="flex items-center gap-2 cursor-pointer">
-            <input type="checkbox" name="visible" checked={formData.visible} onChange={handleChange} className="w-4 h-4 accent-[#1A56DB]" />
-            <span className="font-mono text-sm text-[#f0f6ff]">Visible</span>
+            <input type="checkbox" name="visible" checked={formData.visible} onChange={handleChange} className="w-4 h-4 accent-sky-400" />
+            <span className="text-[var(--text-main)]">Visible on Website</span>
           </label>
         </div>
 
-        <div className="flex justify-end gap-4 mt-4 border-t-2 border-[#1e2d4a] pt-4">
-          <button type="button" onClick={onCancel} className="bg-transparent text-[#8fa3c0] font-mono uppercase text-[12px] px-4 py-2 hover:text-[#f0f6ff]">Cancel</button>
-          <button type="submit" className="bg-[#4fcea6] text-[#0d2a22] font-mono font-bold uppercase text-[12px] px-6 py-2 hover:bg-[#3db892]">Save Project</button>
+        <div className="flex justify-end gap-3 pt-4 border-t border-[var(--border-subtle)]">
+          <button type="button" onClick={onCancel} className="bg-transparent text-[var(--text-muted)] hover:text-[var(--text-main)] font-bold px-5 py-2.5 rounded-full transition-all">Cancel</button>
+          <button type="submit" className="bg-[var(--text-main)] text-[var(--bg-main)] font-bold px-6 py-2.5 rounded-full hover:opacity-90 transition-all flex items-center gap-2 shadow-xl">
+            <Check className="w-4 h-4" /> Save Project Changes
+          </button>
         </div>
       </form>
     </div>

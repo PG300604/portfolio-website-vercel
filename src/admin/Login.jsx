@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
 import { writeGitHubData } from '../hooks/useGitHubWrite';
+import { Shield, Eye, EyeOff, Lock, Key, Check } from 'lucide-react';
 
 async function hashString(str) {
   const msgBuffer = new TextEncoder().encode(str);
@@ -49,7 +50,7 @@ export default function Login() {
       if (success) {
         navigate('/admin/dashboard');
       } else {
-        setLoginError('Invalid admin secret');
+        setLoginError('Invalid admin secret key');
       }
     } catch (err) {
       setLoginError(err.message || 'Login failed');
@@ -130,22 +131,23 @@ export default function Login() {
   };
 
   return (
-    <div className="min-h-screen bg-[#060a14] flex items-center justify-center p-4">
-      <div className="bg-[#0d1525] border-2 border-[#1A56DB] p-8 w-full max-w-md border-t-[4px] border-t-[#1A56DB]">
+    <div className="min-h-screen bg-[var(--bg-main)] flex items-center justify-center p-6 text-[var(--text-main)] font-sora">
+      <div className="bg-[var(--card-bg)] border border-[var(--border-subtle)] p-8 sm:p-10 w-full max-w-md rounded-3xl shadow-2xl space-y-8">
         
         {/* LOGIN MODE */}
         {mode === 'login' && (
           <>
-            <div className="mb-8">
-              <div className="font-mono text-[11px] text-[#4fcea6] uppercase tracking-widest mb-2">
-                // SECURE_ZONE
+            <div>
+              <div className="font-mono-custom text-xs text-[var(--text-muted)] uppercase tracking-widest mb-2 flex items-center gap-2">
+                <Shield className="w-4 h-4 text-emerald-400" />
+                <span>// SECURE ADMINISTRATIVE GATEWAY</span>
               </div>
-              <h1 className="text-3xl font-sora font-bold text-[#f0f6ff]">Admin Access</h1>
+              <h1 className="text-3xl font-extrabold tracking-tight">Admin Authentication</h1>
             </div>
 
-            <form onSubmit={handleLoginSubmit} className="flex flex-col gap-6">
+            <form onSubmit={handleLoginSubmit} className="space-y-6 font-mono-custom text-xs">
               <div>
-                <label className="block font-mono text-[11px] text-[#8fa3c0] uppercase tracking-widest mb-2">
+                <label className="block text-[var(--text-muted)] uppercase tracking-wider mb-2">
                   Secret Key
                 </label>
                 <div className="relative">
@@ -153,47 +155,38 @@ export default function Login() {
                     type={showPassword ? 'text' : 'password'}
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    className="w-full bg-[#0d1525] text-[#f0f6ff] border-2 border-[#1e2d4a] p-[10px] pr-10 font-mono text-sm focus:border-3 focus:border-[#1A56DB] focus:outline-none hover:border-[#388bfd] transition-colors rounded-none"
+                    className="w-full bg-[var(--bg-main)] text-[var(--text-main)] border border-[var(--border-subtle)] focus:border-[var(--text-main)] p-3.5 pr-12 rounded-xl outline-none"
                     placeholder="Enter admin secret..."
                     required
                   />
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-[#8fa3c0] hover:text-[#388bfd] focus:outline-none"
-                    aria-label={showPassword ? 'Hide password' : 'Show password'}
+                    className="absolute right-4 top-1/2 -translate-y-1/2 text-[var(--text-muted)] hover:text-[var(--text-main)] focus:outline-none"
                   >
-                    {showPassword ? (
-                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l18 18" />
-                      </svg>
-                    ) : (
-                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                      </svg>
-                    )}
+                    {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                   </button>
                 </div>
-                {loginError && <p className="text-[#e55353] text-sm mt-2 font-mono">{loginError}</p>}
+                {loginError && <p className="text-red-400 text-xs mt-2 font-mono-custom">{loginError}</p>}
               </div>
 
               <div className="flex justify-between items-center">
                 <button
                   type="button"
                   onClick={() => setMode('forgot')}
-                  className="font-mono text-[11px] text-[#8fa3c0] hover:text-[#388bfd] underline bg-transparent border-none cursor-pointer"
+                  className="font-mono-custom text-xs text-[var(--text-muted)] hover:text-[var(--text-main)] underline bg-transparent border-none cursor-pointer"
                 >
-                  Forgot Password?
+                  Forgot Secret Password?
                 </button>
               </div>
 
               <button
                 type="submit"
                 disabled={loginLoading}
-                className="bg-[#1A56DB] text-[#f0f6ff] border-[3px] border-[#1A56DB] px-7 py-3 font-mono font-bold text-[13px] uppercase tracking-[0.1em] hover:bg-[#388bfd] hover:border-[#388bfd] active:bg-[#0f3d9e] transition-colors rounded-none disabled:opacity-50"
+                className="w-full bg-[var(--text-main)] text-[var(--bg-main)] font-bold py-3.5 rounded-full uppercase tracking-wider hover:opacity-90 transition-all flex items-center justify-center gap-2 shadow-xl cursor-pointer"
               >
-                {loginLoading ? 'Authenticating...' : 'Authenticate'}
+                <Lock className="w-4 h-4" />
+                <span>{loginLoading ? 'AUTHENTICATING...' : 'AUTHENTICATE'}</span>
               </button>
             </form>
           </>
@@ -202,55 +195,56 @@ export default function Login() {
         {/* FORGOT PASSWORD MODE */}
         {mode === 'forgot' && (
           <>
-            <div className="mb-8">
-              <div className="font-mono text-[11px] text-[#4fcea6] uppercase tracking-widest mb-2">
-                // PASSWORD_RECOVERY
+            <div>
+              <div className="font-mono-custom text-xs text-[var(--text-muted)] uppercase tracking-widest mb-2 flex items-center gap-2">
+                <Key className="w-4 h-4 text-sky-400" />
+                <span>// IDENTITY RECOVERY</span>
               </div>
-              <h1 className="text-2xl font-sora font-bold text-[#f0f6ff]">Verify Identity</h1>
+              <h1 className="text-2xl font-extrabold tracking-tight">Security Verification</h1>
             </div>
 
             {!credentials?.questions || credentials.questions.length < 2 ? (
-              <div className="space-y-6">
-                <p className="text-sm font-mono text-[#8fa3c0] leading-relaxed">
+              <div className="space-y-6 font-mono-custom text-xs">
+                <p className="text-[var(--text-muted)] leading-relaxed">
                   No security recovery questions have been configured for this portfolio yet. 
                 </p>
-                <div className="bg-[#e55353]/10 border border-[#e55353] text-[#e55353] p-4 font-mono text-xs leading-relaxed">
-                  Please log in using your default Secret Key from the local environment configurations, and set up your questions inside Settings.
+                <div className="bg-red-500/10 border border-red-500/30 text-red-400 p-4 rounded-xl leading-relaxed">
+                  Please log in using your default Secret Key, and set up your questions inside Security Settings.
                 </div>
                 <button
                   onClick={() => setMode('login')}
-                  className="w-full bg-[#060a14] text-[#8fa3c0] border-2 border-[#1e2d4a] py-3 font-mono text-xs uppercase hover:border-[#388bfd] hover:text-white"
+                  className="w-full bg-[var(--bg-main)] text-[var(--text-main)] border border-[var(--border-subtle)] py-3 rounded-full uppercase font-bold hover:border-[var(--text-main)]"
                 >
                   Back to Login
                 </button>
               </div>
             ) : (
-              <form onSubmit={handleRecoverySubmit} className="flex flex-col gap-6">
-                {recoveryError && <div className="bg-[#e55353]/10 border border-[#e55353] text-[#e55353] p-3 text-xs font-mono">{recoveryError}</div>}
+              <form onSubmit={handleRecoverySubmit} className="space-y-6 font-mono-custom text-xs">
+                {recoveryError && <div className="bg-red-500/10 border border-red-500/30 text-red-400 p-3 rounded-xl">{recoveryError}</div>}
                 
                 <div>
-                  <label className="block font-mono text-[11px] text-[#4fcea6] uppercase tracking-wider mb-2">
-                    Question 1: {credentials.questions[0].question}
+                  <label className="block text-emerald-400 uppercase tracking-wider mb-2">
+                    Q1: {credentials.questions[0].question}
                   </label>
                   <input
                     type="text"
                     value={ans1}
                     onChange={(e) => setAns1(e.target.value)}
-                    className="w-full bg-[#0d1525] text-[#f0f6ff] border-2 border-[#1e2d4a] p-[10px] font-mono text-sm focus:border-[#1A56DB] focus:outline-none"
+                    className="w-full bg-[var(--bg-main)] text-[var(--text-main)] border border-[var(--border-subtle)] focus:border-[var(--text-main)] p-3.5 rounded-xl outline-none"
                     placeholder="Enter answer..."
                     required
                   />
                 </div>
 
                 <div>
-                  <label className="block font-mono text-[11px] text-[#4fcea6] uppercase tracking-wider mb-2">
-                    Question 2: {credentials.questions[1].question}
+                  <label className="block text-emerald-400 uppercase tracking-wider mb-2">
+                    Q2: {credentials.questions[1].question}
                   </label>
                   <input
                     type="text"
                     value={ans2}
                     onChange={(e) => setAns2(e.target.value)}
-                    className="w-full bg-[#0d1525] text-[#f0f6ff] border-2 border-[#1e2d4a] p-[10px] font-mono text-sm focus:border-[#1A56DB] focus:outline-none"
+                    className="w-full bg-[var(--bg-main)] text-[var(--text-main)] border border-[var(--border-subtle)] focus:border-[var(--text-main)] p-3.5 rounded-xl outline-none"
                     placeholder="Enter answer..."
                     required
                   />
@@ -265,16 +259,16 @@ export default function Login() {
                       setAns1('');
                       setAns2('');
                     }}
-                    className="flex-1 bg-transparent border-2 border-[#1e2d4a] text-[#8fa3c0] py-3 font-mono text-xs uppercase hover:text-white hover:border-[#8fa3c0]"
+                    className="flex-1 bg-[var(--bg-main)] border border-[var(--border-subtle)] text-[var(--text-muted)] hover:text-[var(--text-main)] py-3.5 rounded-full uppercase font-bold"
                   >
                     Cancel
                   </button>
                   <button
                     type="submit"
                     disabled={recoveryLoading}
-                    className="flex-1 bg-[#1A56DB] text-white py-3 font-mono font-bold text-xs uppercase hover:bg-[#388bfd] disabled:opacity-50"
+                    className="flex-1 bg-[var(--text-main)] text-[var(--bg-main)] font-bold py-3.5 rounded-full uppercase tracking-wider hover:opacity-90"
                   >
-                    {recoveryLoading ? 'VERIFYING...' : 'VERIFY ANSWERS'}
+                    {recoveryLoading ? 'VERIFYING...' : 'VERIFY'}
                   </button>
                 </div>
               </form>
@@ -285,35 +279,36 @@ export default function Login() {
         {/* RESET PASSWORD MODE */}
         {mode === 'reset' && (
           <>
-            <div className="mb-8">
-              <div className="font-mono text-[11px] text-[#4fcea6] uppercase tracking-widest mb-2">
-                // PASSWORD_RESET
+            <div>
+              <div className="font-mono-custom text-xs text-[var(--text-muted)] uppercase tracking-widest mb-2 flex items-center gap-2">
+                <Check className="w-4 h-4 text-emerald-400" />
+                <span>// PASSWORD RESET</span>
               </div>
-              <h1 className="text-2xl font-sora font-bold text-[#f0f6ff]">Set New Password</h1>
+              <h1 className="text-2xl font-extrabold tracking-tight">Configure New Password</h1>
             </div>
 
-            <form onSubmit={handleResetSubmit} className="flex flex-col gap-6">
-              {resetError && <div className="bg-[#e55353]/10 border border-[#e55353] text-[#e55353] p-3 text-xs font-mono">{resetError}</div>}
+            <form onSubmit={handleResetSubmit} className="space-y-6 font-mono-custom text-xs">
+              {resetError && <div className="bg-red-500/10 border border-red-500/30 text-red-400 p-3 rounded-xl">{resetError}</div>}
 
               <div>
-                <label className="block font-mono text-[11px] text-[#8fa3c0] mb-2">New Password</label>
+                <label className="block text-[var(--text-muted)] mb-2 uppercase">New Secret Password</label>
                 <input
                   type="password"
                   value={newPassword}
                   onChange={(e) => setNewPassword(e.target.value)}
-                  className="w-full bg-[#0d1525] text-[#f0f6ff] border-2 border-[#1e2d4a] p-[10px] font-mono text-sm focus:border-[#1A56DB] focus:outline-none"
+                  className="w-full bg-[var(--bg-main)] text-[var(--text-main)] border border-[var(--border-subtle)] focus:border-[var(--text-main)] p-3.5 rounded-xl outline-none"
                   placeholder="At least 6 characters..."
                   required
                 />
               </div>
 
               <div>
-                <label className="block font-mono text-[11px] text-[#8fa3c0] mb-2">Confirm New Password</label>
+                <label className="block text-[var(--text-muted)] mb-2 uppercase">Confirm New Secret Password</label>
                 <input
                   type="password"
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
-                  className="w-full bg-[#0d1525] text-[#f0f6ff] border-2 border-[#1e2d4a] p-[10px] font-mono text-sm focus:border-[#1A56DB] focus:outline-none"
+                  className="w-full bg-[var(--bg-main)] text-[var(--text-main)] border border-[var(--border-subtle)] focus:border-[var(--text-main)] p-3.5 rounded-xl outline-none"
                   required
                 />
               </div>
@@ -321,9 +316,9 @@ export default function Login() {
               <button
                 type="submit"
                 disabled={resetLoading}
-                className="w-full bg-[#4fcea6] text-[#060a14] py-3 font-mono font-bold text-xs uppercase hover:bg-[#3db892] disabled:opacity-50"
+                className="w-full bg-[var(--text-main)] text-[var(--bg-main)] font-bold py-3.5 rounded-full uppercase tracking-wider hover:opacity-90 shadow-xl"
               >
-                {resetLoading ? 'SAVING...' : 'RESET PASSWORD & LOGIN'}
+                {resetLoading ? 'SAVING...' : 'SAVE & LOGIN'}
               </button>
             </form>
           </>
