@@ -2,12 +2,14 @@ import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useGitHubData } from '../hooks/useGitHubData';
 import { writeGitHubData } from '../hooks/useGitHubWrite';
+import { ArrowLeft, Plus, Trash2, Award, AlertCircle, CheckCircle2 } from 'lucide-react';
 
 export default function CertsAdmin() {
   const { data: initialCerts, loading, error: fetchError } = useGitHubData('certifications.json');
   const [certs, setCerts] = useState([]);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState(null);
+  const [success, setSuccess] = useState(false);
   const [newCert, setNewCert] = useState({ id: '', name: '', org: '', issuedBy: '', date: '', credentialId: '', featured: false });
 
   useEffect(() => {
@@ -24,7 +26,7 @@ export default function CertsAdmin() {
   };
 
   const handleDelete = async (id) => {
-    if (!window.confirm('Delete this cert?')) return;
+    if (!window.confirm('Delete this certification entry?')) return;
     const updated = certs.filter(c => c.id !== id);
     setCerts(updated);
     await saveToGitHub(updated);
@@ -35,6 +37,8 @@ export default function CertsAdmin() {
     setError(null);
     try {
       await writeGitHubData('certifications.json', dataToSave);
+      setSuccess(true);
+      setTimeout(() => setSuccess(false), 3000);
     } catch (err) {
       setError(err.message);
     } finally {
@@ -42,78 +46,182 @@ export default function CertsAdmin() {
     }
   };
 
-  if (loading) return <div className="p-8 text-[#f0f6ff] bg-[#060a14] min-h-screen">Loading...</div>;
+  if (loading) return (
+    <div className="min-h-screen bg-[var(--bg-main)] text-[var(--text-main)] p-8 font-mono-custom flex items-center justify-center">
+      <div className="flex items-center gap-3 animate-pulse">
+        <Award className="w-5 h-5 text-[var(--accent-glow)]" />
+        <span>Loading Certifications...</span>
+      </div>
+    </div>
+  );
 
   return (
-    <div className="min-h-screen bg-[#060a14] p-8 text-[#f0f6ff]">
-      <div className="max-w-5xl mx-auto">
-        <div className="flex justify-between items-center mb-8 border-b-2 border-[#1e2d4a] pb-6">
+    <div className="min-h-screen bg-[var(--bg-main)] text-[var(--text-main)] p-4 sm:p-8 font-mono-custom">
+      <div className="max-w-5xl mx-auto space-y-8">
+        
+        {/* Navigation & Header */}
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center pb-6 border-b border-[var(--border-subtle)] gap-4">
           <div>
-            <div className="font-mono text-[11px] text-[#4fcea6] uppercase tracking-widest mb-2">
-              <Link to="/admin/dashboard" className="text-[#8fa3c0] hover:text-[#388bfd]">Dashboard</Link> / CERTIFICATIONS
-            </div>
-            <h1 className="text-3xl font-sora font-bold">Manage Certs</h1>
+            <Link 
+              to="/admin/dashboard" 
+              className="inline-flex items-center gap-2 text-xs text-[var(--text-muted)] hover:text-[var(--text-main)] transition-colors mb-2 uppercase tracking-wider"
+            >
+              <ArrowLeft className="w-3.5 h-3.5" />
+              <span>Back to Dashboard</span>
+            </Link>
+            <h1 className="text-2xl sm:text-3xl font-sora font-extrabold">Certifications Management</h1>
           </div>
+          <span className="text-xs text-[var(--text-muted)] uppercase tracking-widest">[ {certs.length} CREDENTIALS TOTAL ]</span>
         </div>
 
-        {error && <div className="bg-[#2a0f0f] border-2 border-[#e55353] p-4 mb-6 text-[#e55353] font-mono text-sm">{error}</div>}
-        {fetchError && <div className="bg-[#2a0f0f] border-2 border-[#e55353] p-4 mb-6 text-[#e55353] font-mono text-sm">{fetchError.message}</div>}
-        {saving && <div className="bg-[#0d2a22] border-2 border-[#4fcea6] p-4 mb-6 text-[#4fcea6] font-mono text-sm">Saving to GitHub...</div>}
+        {/* Notifications */}
+        {error && (
+          <div className="p-4 rounded-xl bg-red-500/10 border border-red-500/30 text-red-400 text-xs flex items-center gap-3">
+            <AlertCircle className="w-4 h-4 shrink-0" />
+            <span>{error}</span>
+          </div>
+        )}
+        {fetchError && (
+          <div className="p-4 rounded-xl bg-red-500/10 border border-red-500/30 text-red-400 text-xs flex items-center gap-3">
+            <AlertCircle className="w-4 h-4 shrink-0" />
+            <span>{fetchError.message}</span>
+          </div>
+        )}
+        {success && (
+          <div className="p-4 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-xs flex items-center gap-3">
+            <CheckCircle2 className="w-4 h-4 shrink-0" />
+            <span>Certifications saved to GitHub successfully!</span>
+          </div>
+        )}
 
-        <div className="bg-[#0d1525] border-2 border-[#1A56DB] p-6 mb-8 border-t-[4px] border-t-[#1A56DB]">
-          <h3 className="font-mono text-[13px] text-[#1A56DB] uppercase tracking-widest mb-4">Add New Cert</h3>
-          <form onSubmit={handleAdd} className="flex flex-col gap-4">
+        {/* Add Cert Form Card */}
+        <div className="bg-[var(--card-bg)] border border-[var(--border-subtle)] p-6 rounded-2xl shadow-xl space-y-4">
+          <div className="flex items-center gap-2 pb-3 border-b border-[var(--border-subtle)] text-xs text-[var(--text-muted)] uppercase tracking-wider font-bold">
+            <Plus className="w-4 h-4 text-[var(--accent-glow)]" />
+            <span>Add New Certificate / Credential</span>
+          </div>
+
+          <form onSubmit={handleAdd} className="space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label className="block font-mono text-[11px] text-[#8fa3c0] uppercase tracking-widest mb-1">ID (slug)</label>
-                <input value={newCert.id} onChange={e => setNewCert({...newCert, id: e.target.value})} className="w-full bg-[#060a14] text-[#f0f6ff] border-2 border-[#1e2d4a] p-2 font-mono text-sm" required />
+                <label className="block text-[11px] text-[var(--text-muted)] uppercase tracking-wider mb-2">ID (slug)</label>
+                <input 
+                  value={newCert.id} 
+                  onChange={e => setNewCert({...newCert, id: e.target.value})} 
+                  placeholder="e.g. java-se-17" 
+                  className="w-full bg-[var(--bg-main)] text-[var(--text-main)] border border-[var(--border-subtle)] focus:border-[var(--text-main)] rounded-xl px-4 py-2.5 text-xs outline-none transition-colors" 
+                  required 
+                />
               </div>
               <div>
-                <label className="block font-mono text-[11px] text-[#8fa3c0] uppercase tracking-widest mb-1">Name / Title</label>
-                <input value={newCert.name} onChange={e => setNewCert({...newCert, name: e.target.value})} className="w-full bg-[#060a14] text-[#f0f6ff] border-2 border-[#1e2d4a] p-2 font-mono text-sm" required />
+                <label className="block text-[11px] text-[var(--text-muted)] uppercase tracking-wider mb-2">Certificate Title</label>
+                <input 
+                  value={newCert.name} 
+                  onChange={e => setNewCert({...newCert, name: e.target.value})} 
+                  placeholder="e.g. Java SE 17 Developer Certification" 
+                  className="w-full bg-[var(--bg-main)] text-[var(--text-main)] border border-[var(--border-subtle)] focus:border-[var(--text-main)] rounded-xl px-4 py-2.5 text-xs outline-none transition-colors" 
+                  required 
+                />
               </div>
             </div>
+
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div>
-                <label className="block font-mono text-[11px] text-[#8fa3c0] uppercase tracking-widest mb-1">Organization</label>
-                <input value={newCert.org} onChange={e => setNewCert({...newCert, org: e.target.value})} className="w-full bg-[#060a14] text-[#f0f6ff] border-2 border-[#1e2d4a] p-2 font-mono text-sm" />
+                <label className="block text-[11px] text-[var(--text-muted)] uppercase tracking-wider mb-2">Organization</label>
+                <input 
+                  value={newCert.org} 
+                  onChange={e => setNewCert({...newCert, org: e.target.value})} 
+                  placeholder="e.g. Oracle" 
+                  className="w-full bg-[var(--bg-main)] text-[var(--text-main)] border border-[var(--border-subtle)] focus:border-[var(--text-main)] rounded-xl px-4 py-2.5 text-xs outline-none transition-colors" 
+                />
               </div>
               <div>
-                <label className="block font-mono text-[11px] text-[#8fa3c0] uppercase tracking-widest mb-1">Issued By</label>
-                <input value={newCert.issuedBy} onChange={e => setNewCert({...newCert, issuedBy: e.target.value})} className="w-full bg-[#060a14] text-[#f0f6ff] border-2 border-[#1e2d4a] p-2 font-mono text-sm" />
+                <label className="block text-[11px] text-[var(--text-muted)] uppercase tracking-wider mb-2">Issued By</label>
+                <input 
+                  value={newCert.issuedBy} 
+                  onChange={e => setNewCert({...newCert, issuedBy: e.target.value})} 
+                  placeholder="e.g. Oracle University" 
+                  className="w-full bg-[var(--bg-main)] text-[var(--text-main)] border border-[var(--border-subtle)] focus:border-[var(--text-main)] rounded-xl px-4 py-2.5 text-xs outline-none transition-colors" 
+                />
               </div>
               <div>
-                <label className="block font-mono text-[11px] text-[#8fa3c0] uppercase tracking-widest mb-1">Date</label>
-                <input value={newCert.date} onChange={e => setNewCert({...newCert, date: e.target.value})} className="w-full bg-[#060a14] text-[#f0f6ff] border-2 border-[#1e2d4a] p-2 font-mono text-sm" />
+                <label className="block text-[11px] text-[var(--text-muted)] uppercase tracking-wider mb-2">Issue Date</label>
+                <input 
+                  value={newCert.date} 
+                  onChange={e => setNewCert({...newCert, date: e.target.value})} 
+                  placeholder="e.g. May 2025" 
+                  className="w-full bg-[var(--bg-main)] text-[var(--text-main)] border border-[var(--border-subtle)] focus:border-[var(--text-main)] rounded-xl px-4 py-2.5 text-xs outline-none transition-colors" 
+                />
               </div>
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-end">
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-center">
               <div>
-                <label className="block font-mono text-[11px] text-[#8fa3c0] uppercase tracking-widest mb-1">Credential ID (optional)</label>
-                <input value={newCert.credentialId} onChange={e => setNewCert({...newCert, credentialId: e.target.value})} className="w-full bg-[#060a14] text-[#f0f6ff] border-2 border-[#1e2d4a] p-2 font-mono text-sm" />
+                <label className="block text-[11px] text-[var(--text-muted)] uppercase tracking-wider mb-2">Credential ID (Optional)</label>
+                <input 
+                  value={newCert.credentialId} 
+                  onChange={e => setNewCert({...newCert, credentialId: e.target.value})} 
+                  placeholder="e.g. ORC-8930211" 
+                  className="w-full bg-[var(--bg-main)] text-[var(--text-main)] border border-[var(--border-subtle)] focus:border-[var(--text-main)] rounded-xl px-4 py-2.5 text-xs outline-none transition-colors" 
+                />
               </div>
-              <div className="flex justify-between items-center h-[40px]">
-                <label className="flex items-center gap-2 cursor-pointer">
-                  <input type="checkbox" checked={newCert.featured} onChange={e => setNewCert({...newCert, featured: e.target.checked})} className="w-4 h-4 accent-[#4fcea6]" />
-                  <span className="font-mono text-sm">Featured</span>
+              <div className="flex items-center justify-between pt-4 md:pt-0">
+                <label className="flex items-center gap-2 cursor-pointer text-xs text-[var(--text-main)] font-mono-custom">
+                  <input 
+                    type="checkbox" 
+                    checked={newCert.featured} 
+                    onChange={e => setNewCert({...newCert, featured: e.target.checked})} 
+                    className="w-4 h-4 rounded accent-[var(--text-main)] cursor-pointer" 
+                  />
+                  <span>Feature Badge</span>
                 </label>
-                <button type="submit" className="bg-[#1A56DB] text-[#f0f6ff] border-[3px] border-[#1A56DB] px-6 py-2 font-mono font-bold text-[12px] uppercase hover:bg-[#388bfd] transition-colors">Add</button>
+                
+                <button 
+                  type="submit" 
+                  disabled={saving}
+                  className="bg-[var(--text-main)] text-[var(--bg-main)] font-bold text-xs uppercase px-6 py-3 rounded-full hover:opacity-90 transition-all shadow-lg inline-flex items-center gap-2 cursor-pointer disabled:opacity-50"
+                >
+                  <Plus className="w-4 h-4" />
+                  <span>{saving ? 'Adding...' : 'Add Certificate'}</span>
+                </button>
               </div>
             </div>
           </form>
         </div>
 
+        {/* Existing Certs Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {certs.map(cert => (
-            <div key={cert.id} className={`bg-[#0d1525] border-2 ${cert.featured ? 'border-[#388bfd]' : 'border-[#1e2d4a]'} p-4 flex justify-between items-start`}>
-              <div>
-                <div className="font-sora font-bold mb-1">{cert.name} {cert.featured && <span className="text-[#4fcea6] text-[10px] uppercase font-mono ml-2 border border-[#4fcea6] px-1">Featured</span>}</div>
-                <div className="font-mono text-[11px] text-[#8fa3c0]">org: {cert.org} | date: {cert.date}</div>
+            <div 
+              key={cert.id} 
+              className={`bg-[var(--card-bg)] border ${cert.featured ? 'border-[var(--text-main)] shadow-2xl' : 'border-[var(--border-subtle)]'} p-5 rounded-2xl flex justify-between items-start hover:border-[var(--border-strong)] transition-all shadow-lg`}
+            >
+              <div className="space-y-1">
+                <div className="flex items-center gap-2 font-sora font-extrabold text-sm text-[var(--text-main)]">
+                  <span>{cert.name}</span>
+                  {cert.featured && (
+                    <span className="font-mono-custom text-[9px] uppercase font-bold bg-[var(--text-main)] text-[var(--bg-main)] px-2 py-0.5 rounded-full shrink-0">
+                      Featured
+                    </span>
+                  )}
+                </div>
+                <div className="text-[11px] text-[var(--text-muted)]">ORG: {cert.org} | DATE: {cert.date}</div>
+                {cert.credentialId && (
+                  <div className="text-[10px] text-[var(--text-muted)] opacity-80">ID: {cert.credentialId}</div>
+                )}
               </div>
-              <button onClick={() => handleDelete(cert.id)} className="text-[#e55353] hover:text-[#f0f6ff] font-mono text-[11px] uppercase ml-4">Del</button>
+              
+              <button 
+                onClick={() => handleDelete(cert.id)} 
+                className="p-2 rounded-xl text-[var(--text-muted)] hover:text-red-400 hover:bg-red-500/10 transition-colors cursor-pointer shrink-0 ml-4"
+                title="Delete certification"
+              >
+                <Trash2 className="w-4 h-4" />
+              </button>
             </div>
           ))}
         </div>
+
       </div>
     </div>
   );

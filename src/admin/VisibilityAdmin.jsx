@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useGitHubData } from '../hooks/useGitHubData';
 import { writeGitHubData } from '../hooks/useGitHubWrite';
+import { ArrowLeft, Eye, EyeOff, ShieldCheck, AlertCircle, CheckCircle2 } from 'lucide-react';
 
 export default function VisibilityAdmin() {
   const { data: initialVisibility, loading, error: fetchError } = useGitHubData('visibility.json');
@@ -29,61 +30,97 @@ export default function VisibilityAdmin() {
     }
   };
 
-  if (loading || !visibility) return <div className="p-8 text-[#f0f6ff] bg-[#060a14] min-h-screen">Loading...</div>;
+  if (loading || !visibility) return (
+    <div className="min-h-screen bg-[var(--bg-main)] text-[var(--text-main)] p-8 font-mono-custom flex items-center justify-center">
+      <div className="flex items-center gap-3 animate-pulse">
+        <Eye className="w-5 h-5 text-[var(--accent-glow)]" />
+        <span>Loading Section Visibility Settings...</span>
+      </div>
+    </div>
+  );
 
   const sections = [
     { key: 'hero', label: 'Hero Section' },
-    { key: 'about', label: 'About Section' },
-    { key: 'stack', label: 'Tech Stack Section' },
-    { key: 'projects', label: 'Projects Section' },
-    { key: 'certifications', label: 'Certifications Section' },
-    { key: 'timeline', label: 'Experience Timeline Section' },
-    { key: 'media', label: 'Media & Socials Section' },
+    { key: 'about', label: 'About & Specifications Section' },
+    { key: 'stack', label: 'Technical Stack & Practice Section' },
+    { key: 'projects', label: 'Selected Projects & 3D Stage Section' },
+    { key: 'certifications', label: 'Certifications & Badges Section' },
+    { key: 'timeline', label: 'Experience & Academic History Section' },
+    { key: 'media', label: 'Media Gallery & Socials Section' },
     { key: 'blogs', label: 'Blogs & Events Section' },
-    { key: 'contact', label: 'Contact Section' }
+    { key: 'contact', label: 'Initiate Collaboration Contact Section' }
   ];
 
   return (
-    <div className="min-h-screen bg-[#060a14] p-8 text-[#f0f6ff]">
-      <div className="max-w-4xl mx-auto">
-        <div className="flex justify-between items-center mb-8 border-b-2 border-[#1e2d4a] pb-6">
+    <div className="min-h-screen bg-[var(--bg-main)] text-[var(--text-main)] p-4 sm:p-8 font-mono-custom">
+      <div className="max-w-4xl mx-auto space-y-8">
+        
+        {/* Navigation & Header */}
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center pb-6 border-b border-[var(--border-subtle)] gap-4">
           <div>
-            <div className="font-mono text-[11px] text-[#4fcea6] uppercase tracking-widest mb-2">
-              <Link to="/admin/dashboard" className="text-[#8fa3c0] hover:text-[#388bfd]">Dashboard</Link> / VISIBILITY
-            </div>
-            <h1 className="text-3xl font-sora font-bold">Manage Section Visibility</h1>
+            <Link 
+              to="/admin/dashboard" 
+              className="inline-flex items-center gap-2 text-xs text-[var(--text-muted)] hover:text-[var(--text-main)] transition-colors mb-2 uppercase tracking-wider"
+            >
+              <ArrowLeft className="w-3.5 h-3.5" />
+              <span>Back to Dashboard</span>
+            </Link>
+            <h1 className="text-2xl sm:text-3xl font-sora font-extrabold">Section Visibility Controls</h1>
           </div>
+          <span className="text-xs text-[var(--text-muted)] uppercase tracking-widest">[ AUTOMATIC INSTANT SYNC ]</span>
         </div>
 
-        {error && <div className="bg-[#2a0f0f] border-2 border-[#e55353] p-4 mb-6 text-[#e55353] font-mono text-sm">{error}</div>}
-        {fetchError && <div className="bg-[#2a0f0f] border-2 border-[#e55353] p-4 mb-6 text-[#e55353] font-mono text-sm">{fetchError.message}</div>}
-        {saving && <div className="bg-[#0d2a22] border-2 border-[#4fcea6] p-4 mb-6 text-[#4fcea6] font-mono text-sm">Saving to GitHub...</div>}
+        {/* Notifications */}
+        {error && (
+          <div className="p-4 rounded-xl bg-red-500/10 border border-red-500/30 text-red-400 text-xs flex items-center gap-3">
+            <AlertCircle className="w-4 h-4 shrink-0" />
+            <span>{error}</span>
+          </div>
+        )}
+        {fetchError && (
+          <div className="p-4 rounded-xl bg-red-500/10 border border-red-500/30 text-red-400 text-xs flex items-center gap-3">
+            <AlertCircle className="w-4 h-4 shrink-0" />
+            <span>{fetchError.message}</span>
+          </div>
+        )}
 
-        <div className="bg-[#0d1525] border-2 border-[#1A56DB] p-6 border-t-[4px] border-t-[#1A56DB]">
-          <p className="text-[#8fa3c0] font-mono text-sm mb-6 border-b border-[#1e2d4a] pb-4">
-            Toggle which sections are visible on the public portfolio. Changes save automatically.
+        <div className="bg-[var(--card-bg)] border border-[var(--border-subtle)] p-6 rounded-2xl shadow-xl space-y-6">
+          <p className="text-xs text-[var(--text-muted)] border-b border-[var(--border-subtle)] pb-4 leading-relaxed">
+            Toggle which public sections are visible or hidden on your main portfolio website. Changes save automatically and sync instantly to GitHub.
           </p>
 
-          <div className="flex flex-col gap-4">
+          <div className="space-y-3">
             {sections.map(({ key, label }) => (
-              <div key={key} className="flex items-center justify-between p-4 border-2 border-[#1e2d4a] bg-[#060a14]">
-                <span className="font-sora font-bold text-[#f0f6ff]">{label}</span>
+              <div 
+                key={key} 
+                className="flex items-center justify-between p-4 rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-main)] hover:border-[var(--border-strong)] transition-all"
+              >
+                <div className="flex items-center gap-3 font-sora font-bold text-sm text-[var(--text-main)]">
+                  {visibility[key] ? (
+                    <Eye className="w-4 h-4 text-emerald-400 shrink-0" />
+                  ) : (
+                    <EyeOff className="w-4 h-4 text-[var(--text-muted)] shrink-0" />
+                  )}
+                  <span>{label}</span>
+                </div>
+
                 <label className="flex items-center cursor-pointer">
                   <div className="relative">
                     <input 
                       type="checkbox" 
                       className="sr-only" 
-                      checked={visibility[key]} 
+                      checked={!!visibility[key]} 
                       onChange={(e) => handleChange(key, e.target.checked)} 
                     />
-                    <div className={`block w-14 h-8 transition-colors ${visibility[key] ? 'bg-[#1A56DB]' : 'bg-[#1e2d4a]'}`}></div>
-                    <div className={`dot absolute left-1 top-1 bg-[#f0f6ff] w-6 h-6 transition-transform ${visibility[key] ? 'transform translate-x-6' : ''}`}></div>
+                    <div className={`block w-12 h-7 rounded-full transition-colors ${visibility[key] ? 'bg-[var(--text-main)]' : 'bg-[var(--card-bg)] border border-[var(--border-subtle)]'}`}></div>
+                    <div className={`dot absolute left-1 top-1 w-5 h-5 rounded-full transition-transform ${visibility[key] ? 'transform translate-x-5 bg-[var(--bg-main)]' : 'bg-[var(--text-muted)]'}`}></div>
                   </div>
                 </label>
               </div>
             ))}
           </div>
         </div>
+
       </div>
     </div>
   );

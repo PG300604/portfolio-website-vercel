@@ -3,6 +3,7 @@ import { useGitHubData } from '../hooks/useGitHubData';
 import { writeGitHubData } from '../hooks/useGitHubWrite';
 import { Link } from 'react-router-dom';
 import ImageUploader from '../components/shared/ImageUploader';
+import { ArrowLeft, Plus, Trash2, BookOpen, Save, AlertCircle, CheckCircle2 } from 'lucide-react';
 
 export default function BlogsAdmin() {
   const { data, loading, error: fetchError, refetch } = useGitHubData('blogs.json');
@@ -35,7 +36,7 @@ export default function BlogsAdmin() {
   const addBlog = () => {
     const newBlog = {
       id: Date.now().toString(),
-      title: 'New Update',
+      title: 'New Update / Article',
       date: new Date().toISOString().split('T')[0],
       content: '',
       image: '',
@@ -54,51 +55,94 @@ export default function BlogsAdmin() {
     }
   };
 
-  if (loading) return <div className="p-8 text-[#8fa3c0] font-mono">Loading data...</div>;
+  if (loading) return (
+    <div className="min-h-screen bg-[var(--bg-main)] text-[var(--text-main)] p-8 font-mono-custom flex items-center justify-center">
+      <div className="flex items-center gap-3 animate-pulse">
+        <BookOpen className="w-5 h-5 text-[var(--accent-glow)]" />
+        <span>Loading Blogs & Events Config...</span>
+      </div>
+    </div>
+  );
 
   return (
-    <div className="min-h-screen bg-[#060a14] p-8 text-[#f0f6ff]">
-      <div className="max-w-4xl mx-auto">
-        <div className="flex justify-between items-center mb-8 border-b-2 border-[#1e2d4a] pb-6">
+    <div className="min-h-screen bg-[var(--bg-main)] text-[var(--text-main)] p-4 sm:p-8 font-mono-custom">
+      <div className="max-w-5xl mx-auto space-y-8">
+        
+        {/* Navigation & Header */}
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center pb-6 border-b border-[var(--border-subtle)] gap-4">
           <div>
-            <div className="font-mono text-[11px] text-[#4fcea6] uppercase tracking-widest mb-2">
-              <Link to="/admin/dashboard" className="text-[#8fa3c0] hover:text-[#388bfd]">Dashboard</Link> / BLOGS & EVENTS
-            </div>
-            <h1 className="text-3xl font-sora font-bold">Manage Blogs & Events</h1>
+            <Link 
+              to="/admin/dashboard" 
+              className="inline-flex items-center gap-2 text-xs text-[var(--text-muted)] hover:text-[var(--text-main)] transition-colors mb-2 uppercase tracking-wider"
+            >
+              <ArrowLeft className="w-3.5 h-3.5" />
+              <span>Back to Dashboard</span>
+            </Link>
+            <h1 className="text-2xl sm:text-3xl font-sora font-extrabold">Blogs & Events Management</h1>
+          </div>
+
+          <div className="flex items-center gap-3">
+            <button 
+              onClick={addBlog} 
+              className="bg-[var(--card-bg)] text-[var(--text-main)] border border-[var(--border-subtle)] hover:border-[var(--border-strong)] px-4 py-2.5 rounded-full text-xs font-bold uppercase transition-all shadow-md inline-flex items-center gap-1.5 cursor-pointer"
+            >
+              <Plus className="w-3.5 h-3.5" />
+              <span>Create Post</span>
+            </button>
+
+            <button 
+              onClick={handleSave} 
+              disabled={saving}
+              className="bg-[var(--text-main)] text-[var(--bg-main)] font-bold text-xs uppercase px-6 py-2.5 rounded-full hover:opacity-90 transition-all shadow-lg inline-flex items-center gap-2 cursor-pointer disabled:opacity-50"
+            >
+              <Save className="w-4 h-4" />
+              <span>{saving ? 'Saving...' : 'Save Posts'}</span>
+            </button>
           </div>
         </div>
-        
-        <div className="flex justify-between items-center mb-8 border-b-2 border-[#1e2d4a] pb-4">
-          <p className="text-[#8fa3c0] text-sm">Post new blogs, events, or general updates here.</p>
-          <button onClick={addBlog} className="bg-[#388bfd] text-white px-4 py-2 font-mono text-sm hover:bg-[#1A56DB] transition-colors">
-            + Create New Post
-          </button>
-        </div>
 
-        {fetchError && <div className="bg-[#e55353]/10 border border-[#e55353] text-[#e55353] p-4 mb-6">{fetchError.message}</div>}
-        {saveError && <div className="bg-[#e55353]/10 border border-[#e55353] text-[#e55353] p-4 mb-6">{saveError}</div>}
-        {success && <div className="bg-[#4fcea6]/10 border border-[#4fcea6] text-[#4fcea6] p-4 mb-6">Saved successfully!</div>}
+        {/* Notifications */}
+        {fetchError && (
+          <div className="p-4 rounded-xl bg-red-500/10 border border-red-500/30 text-red-400 text-xs flex items-center gap-3">
+            <AlertCircle className="w-4 h-4 shrink-0" />
+            <span>{fetchError.message}</span>
+          </div>
+        )}
+        {saveError && (
+          <div className="p-4 rounded-xl bg-red-500/10 border border-red-500/30 text-red-400 text-xs flex items-center gap-3">
+            <AlertCircle className="w-4 h-4 shrink-0" />
+            <span>{saveError}</span>
+          </div>
+        )}
+        {success && (
+          <div className="p-4 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-xs flex items-center gap-3">
+            <CheckCircle2 className="w-4 h-4 shrink-0" />
+            <span>Blog posts saved to GitHub successfully!</span>
+          </div>
+        )}
 
+        {/* Posts List */}
         <div className="space-y-6">
           {blogs.map(blog => (
-            <div key={blog.id} className="bg-[#0d1525] border border-[#1e2d4a] p-6 flex flex-col md:flex-row gap-6 relative">
+            <div key={blog.id} className="bg-[var(--card-bg)] border border-[var(--border-subtle)] p-6 rounded-2xl flex flex-col md:flex-row gap-6 shadow-xl relative">
               <button 
                 onClick={() => removeBlog(blog.id)} 
-                className="absolute top-4 right-4 text-[#e55353] hover:text-white hover:bg-[#e55353] px-3 py-1 font-mono text-xs transition-colors border border-[#e55353]"
+                className="absolute top-4 right-4 p-2.5 rounded-xl border border-red-500/30 text-red-400 hover:bg-red-500/10 transition-colors cursor-pointer"
+                title="Delete post"
               >
-                Delete
+                <Trash2 className="w-4 h-4" />
               </button>
               
-              <div className="w-full md:w-48 flex-shrink-0 space-y-4">
-                <div className="aspect-video bg-[#060a14] border border-[#1e2d4a] flex items-center justify-center overflow-hidden">
+              <div className="w-full md:w-48 shrink-0 space-y-3">
+                <div className="aspect-video bg-[var(--bg-main)] border border-[var(--border-subtle)] rounded-xl flex items-center justify-center overflow-hidden">
                   {blog.image ? (
                     <img src={blog.image} alt="" className="w-full h-full object-cover" onError={(e) => e.target.style.display='none'} />
                   ) : (
-                    <span className="text-[#8fa3c0] font-mono text-xs">No Cover Image</span>
+                    <span className="text-[var(--text-muted)] text-[10px] uppercase">No Cover Image</span>
                   )}
                 </div>
                 <div className="space-y-2">
-                  <label className="block font-mono text-[11px] text-[#8fa3c0] mb-1">Cover Image</label>
+                  <label className="block text-[11px] text-[var(--text-muted)] uppercase tracking-wider mb-1">Cover Image</label>
                   <ImageUploader 
                     onUploadSuccess={(url) => updateBlog(blog.id, 'image', url)}
                   />
@@ -106,51 +150,51 @@ export default function BlogsAdmin() {
                     type="text" 
                     value={blog.image || ''} 
                     onChange={(e) => updateBlog(blog.id, 'image', e.target.value)}
-                    placeholder="Or paste an image URL here..."
-                    className="w-full bg-[#060a14] border border-[#1e2d4a] p-2 text-[#f0f6ff] focus:border-[#388bfd] outline-none font-mono text-sm"
+                    placeholder="Or paste image URL..."
+                    className="w-full bg-[var(--bg-main)] text-[var(--text-main)] border border-[var(--border-subtle)] focus:border-[var(--text-main)] rounded-xl px-4 py-2.5 text-xs outline-none transition-colors"
                   />
                 </div>
               </div>
               
-              <div className="flex-1 space-y-4">
-                <div className="flex gap-4">
+              <div className="flex-1 space-y-4 pr-10">
+                <div className="flex flex-col sm:flex-row gap-4">
                   <div className="flex-1">
-                    <label className="block font-mono text-[11px] text-[#8fa3c0] mb-1">Title</label>
+                    <label className="block text-[11px] text-[var(--text-muted)] uppercase tracking-wider mb-1">Article / Event Title</label>
                     <input 
                       type="text" 
                       value={blog.title} 
                       onChange={(e) => updateBlog(blog.id, 'title', e.target.value)}
-                      className="w-full bg-[#060a14] border border-[#1e2d4a] p-2 text-[#f0f6ff] focus:border-[#388bfd] outline-none font-mono text-sm font-bold"
+                      className="w-full bg-[var(--bg-main)] text-[var(--text-main)] border border-[var(--border-subtle)] focus:border-[var(--text-main)] rounded-xl px-4 py-2.5 text-xs outline-none transition-colors font-bold"
                     />
                   </div>
-                  <div className="w-40">
-                    <label className="block font-mono text-[11px] text-[#8fa3c0] mb-1">Date</label>
+                  <div className="w-full sm:w-40">
+                    <label className="block text-[11px] text-[var(--text-muted)] uppercase tracking-wider mb-1">Publish Date</label>
                     <input 
                       type="date" 
                       value={blog.date} 
                       onChange={(e) => updateBlog(blog.id, 'date', e.target.value)}
-                      className="w-full bg-[#060a14] border border-[#1e2d4a] p-2 text-[#f0f6ff] focus:border-[#388bfd] outline-none font-mono text-sm"
+                      className="w-full bg-[var(--bg-main)] text-[var(--text-main)] border border-[var(--border-subtle)] focus:border-[var(--text-main)] rounded-xl px-4 py-2.5 text-xs outline-none transition-colors"
                     />
                   </div>
                 </div>
 
                 <div>
-                  <label className="block font-mono text-[11px] text-[#8fa3c0] mb-1">External Link (Optional)</label>
+                  <label className="block text-[11px] text-[var(--text-muted)] uppercase tracking-wider mb-1">External Link (Optional)</label>
                   <input 
                     type="text" 
                     value={blog.link || ''} 
                     onChange={(e) => updateBlog(blog.id, 'link', e.target.value)}
-                    className="w-full bg-[#060a14] border border-[#1e2d4a] p-2 text-[#f0f6ff] focus:border-[#388bfd] outline-none font-mono text-sm"
-                    placeholder="https://..."
+                    className="w-full bg-[var(--bg-main)] text-[var(--text-main)] border border-[var(--border-subtle)] focus:border-[var(--text-main)] rounded-xl px-4 py-2.5 text-xs outline-none transition-colors"
+                    placeholder="https://medium.com/..."
                   />
                 </div>
                 
                 <div>
-                  <label className="block font-mono text-[11px] text-[#8fa3c0] mb-1">Content Snippet</label>
+                  <label className="block text-[11px] text-[var(--text-muted)] uppercase tracking-wider mb-1">Content Snippet</label>
                   <textarea 
                     value={blog.content} 
                     onChange={(e) => updateBlog(blog.id, 'content', e.target.value)}
-                    className="w-full bg-[#060a14] border border-[#1e2d4a] p-2 text-[#f0f6ff] focus:border-[#388bfd] outline-none font-mono text-sm h-32 resize-y"
+                    className="w-full bg-[var(--bg-main)] text-[var(--text-main)] border border-[var(--border-subtle)] focus:border-[var(--text-main)] rounded-xl p-4 text-xs outline-none transition-colors h-28 resize-y leading-relaxed"
                   />
                 </div>
               </div>
@@ -158,21 +202,13 @@ export default function BlogsAdmin() {
           ))}
           
           {blogs.length === 0 && (
-            <div className="text-center py-12 text-[#8fa3c0] font-mono border-2 border-dashed border-[#1e2d4a]">
-              No posts yet. Click "Create New Post" to start.
+            <div className="text-center py-16 text-[var(--text-muted)] border border-dashed border-[var(--border-subtle)] rounded-2xl space-y-3">
+              <BookOpen className="w-8 h-8 mx-auto opacity-50 text-[var(--text-muted)]" />
+              <div className="text-xs">No posts yet. Click "Create Post" to write one.</div>
             </div>
           )}
         </div>
 
-        <div className="mt-8 pt-6 border-t-2 border-[#1e2d4a]">
-          <button 
-            onClick={handleSave} 
-            disabled={saving}
-            className="w-full bg-[#4fcea6] text-[#060a14] font-bold font-mono py-3 hover:bg-[#388bfd] hover:text-white transition-colors disabled:opacity-50"
-          >
-            {saving ? 'SAVING...' : 'SAVE CHANGES TO GITHUB'}
-          </button>
-        </div>
       </div>
     </div>
   );

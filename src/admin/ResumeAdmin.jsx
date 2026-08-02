@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import axios from 'axios';
 import { useGitHubData } from '../hooks/useGitHubData';
 import { writeGitHubData } from '../hooks/useGitHubWrite';
+import { ArrowLeft, FileText, Upload, Download, CheckCircle2, AlertCircle, ExternalLink } from 'lucide-react';
 
 export default function ResumeAdmin() {
   const { data: about, loading } = useGitHubData('about.json');
@@ -15,7 +16,7 @@ export default function ResumeAdmin() {
     if (!file) return;
     
     if (file.type !== 'application/pdf') {
-      setError('Please upload a valid PDF file.');
+      setError('Please upload a valid PDF document (.pdf).');
       return;
     }
 
@@ -35,7 +36,6 @@ export default function ResumeAdmin() {
         const getRes = await axios.get(url, { headers: { Authorization: `Bearer ${token}` } });
         currentSha = getRes.data.sha;
       } catch (err) {
-        // File might not exist yet, which is fine
         if (err.response && err.response.status !== 404) {
           throw err;
         }
@@ -53,7 +53,7 @@ export default function ResumeAdmin() {
             sha: currentSha
           }, { headers: { Authorization: `Bearer ${token}` } });
 
-          // 3. Update about.json with the raw URL just to be sure
+          // 3. Update about.json with raw URL
           if (about) {
             const resumeUrl = `https://raw.githubusercontent.com/${owner}/${repo}/main/assets/resume.pdf`;
             if (about.resumeUrl !== resumeUrl) {
@@ -65,48 +65,80 @@ export default function ResumeAdmin() {
           setSaving(false);
         } catch (err) {
           console.error(err);
-          setError(err.message);
+          setError(err.message || 'Failed to upload PDF');
           setSaving(false);
         }
       };
       reader.readAsDataURL(file);
     } catch (err) {
       console.error(err);
-      setError(err.message);
+      setError(err.message || 'Failed to upload PDF');
       setSaving(false);
     }
   };
 
-  if (loading) return <div className="p-8 text-[#f0f6ff] bg-[#060a14] min-h-screen">Loading...</div>;
+  if (loading) return (
+    <div className="min-h-screen bg-[var(--bg-main)] text-[var(--text-main)] p-8 font-mono-custom flex items-center justify-center">
+      <div className="flex items-center gap-3 animate-pulse">
+        <FileText className="w-5 h-5 text-[var(--accent-glow)]" />
+        <span>Loading Resume Config...</span>
+      </div>
+    </div>
+  );
 
   return (
-    <div className="min-h-screen bg-[#060a14] p-8 text-[#f0f6ff]">
-      <div className="max-w-4xl mx-auto">
-        <div className="flex justify-between items-center mb-8 border-b-2 border-[#1e2d4a] pb-6">
+    <div className="min-h-screen bg-[var(--bg-main)] text-[var(--text-main)] p-4 sm:p-8 font-mono-custom">
+      <div className="max-w-4xl mx-auto space-y-8">
+        
+        {/* Navigation & Header */}
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center pb-6 border-b border-[var(--border-subtle)] gap-4">
           <div>
-            <div className="font-mono text-[11px] text-[#4fcea6] uppercase tracking-widest mb-2">
-              <Link to="/admin/dashboard" className="text-[#8fa3c0] hover:text-[#388bfd]">Dashboard</Link> / RESUME
-            </div>
-            <h1 className="text-3xl font-sora font-bold">Manage Resume</h1>
+            <Link 
+              to="/admin/dashboard" 
+              className="inline-flex items-center gap-2 text-xs text-[var(--text-muted)] hover:text-[var(--text-main)] transition-colors mb-2 uppercase tracking-wider"
+            >
+              <ArrowLeft className="w-3.5 h-3.5" />
+              <span>Back to Dashboard</span>
+            </Link>
+            <h1 className="text-2xl sm:text-3xl font-sora font-extrabold">Resume PDF Upload</h1>
           </div>
+          <span className="text-xs text-[var(--text-muted)] uppercase tracking-widest">[ DIRECT ASSETS SYNC ]</span>
         </div>
 
-        {error && <div className="bg-[#2a0f0f] border-2 border-[#e55353] p-4 mb-6 text-[#e55353] font-mono text-sm">{error}</div>}
-        {success && <div className="bg-[#0d2a22] border-2 border-[#4fcea6] p-4 mb-6 text-[#4fcea6] font-mono text-sm">Resume uploaded successfully!</div>}
+        {/* Notifications */}
+        {error && (
+          <div className="p-4 rounded-xl bg-red-500/10 border border-red-500/30 text-red-400 text-xs flex items-center gap-3">
+            <AlertCircle className="w-4 h-4 shrink-0" />
+            <span>{error}</span>
+          </div>
+        )}
+        {success && (
+          <div className="p-4 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-xs flex items-center gap-3">
+            <CheckCircle2 className="w-4 h-4 shrink-0" />
+            <span>Resume PDF uploaded and synced to GitHub successfully!</span>
+          </div>
+        )}
 
-        <div className="bg-[#0d1525] border-2 border-[#1A56DB] p-6 border-t-[4px] border-t-[#1A56DB]">
-          <h3 className="font-sora font-bold text-xl mb-4">Upload New PDF</h3>
-          <p className="text-[#8fa3c0] font-mono text-sm mb-6">
-            Upload your latest resume PDF here. This will directly replace `assets/resume.pdf` in your GitHub repository and update the download link across the site.
-          </p>
+        <div className="bg-[var(--card-bg)] border border-[var(--border-subtle)] p-6 sm:p-8 rounded-2xl shadow-xl space-y-6">
+          <div className="space-y-2">
+            <h3 className="font-sora font-extrabold text-xl text-[var(--text-main)]">Upload Updated PDF Document</h3>
+            <p className="text-xs text-[var(--text-muted)] leading-relaxed">
+              Upload your latest resume PDF here. It will directly update `assets/resume.pdf` in your GitHub repository and refresh download links across the public site.
+            </p>
+          </div>
 
-          <div className="border-2 border-dashed border-[#1e2d4a] p-12 text-center relative hover:border-[#388bfd] transition-colors">
+          <div className="border-2 border-dashed border-[var(--border-subtle)] hover:border-[var(--text-main)] rounded-2xl p-12 text-center relative transition-all bg-[var(--bg-main)] group">
             {saving ? (
-              <div className="text-[#4fcea6] font-mono text-sm uppercase tracking-widest animate-pulse">Uploading to GitHub...</div>
+              <div className="text-emerald-400 text-xs font-bold uppercase tracking-widest animate-pulse flex flex-col items-center gap-3">
+                <Upload className="w-6 h-6 animate-bounce" />
+                <span>Uploading PDF to GitHub Repository...</span>
+              </div>
             ) : (
-              <>
-                <div className="text-[#1A56DB] font-mono mb-2 uppercase tracking-widest">Select PDF File</div>
-                <div className="text-[#8fa3c0] text-sm">Must be a .pdf document</div>
+              <div className="flex flex-col items-center gap-3">
+                <FileText className="w-8 h-8 text-[var(--text-muted)] group-hover:text-[var(--text-main)] transition-colors" />
+                <div className="font-bold text-xs text-[var(--text-main)] uppercase tracking-wider">Select PDF Document</div>
+                <div className="text-[11px] text-[var(--text-muted)]">Must be a valid .pdf file format</div>
+                
                 <input 
                   type="file" 
                   accept=".pdf" 
@@ -114,19 +146,26 @@ export default function ResumeAdmin() {
                   className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
                   disabled={saving}
                 />
-              </>
+              </div>
             )}
           </div>
 
           {about?.resumeUrl && (
-            <div className="mt-8 pt-6 border-t border-[#1e2d4a]">
-              <h4 className="font-mono text-[11px] text-[#8fa3c0] uppercase tracking-widest mb-2">Current Resume</h4>
-              <a href={about.resumeUrl} target="_blank" rel="noopener noreferrer" className="text-[#388bfd] hover:text-[#4fcea6] font-mono text-sm break-all">
-                {about.resumeUrl}
+            <div className="pt-6 border-t border-[var(--border-subtle)] space-y-2">
+              <h4 className="text-[11px] text-[var(--text-muted)] uppercase tracking-wider">Active Public Resume Link</h4>
+              <a 
+                href={about.resumeUrl} 
+                target="_blank" 
+                rel="noopener noreferrer" 
+                className="text-xs text-[var(--text-main)] hover:underline break-all inline-flex items-center gap-1.5 font-bold"
+              >
+                <span>{about.resumeUrl}</span>
+                <ExternalLink className="w-3.5 h-3.5 shrink-0" />
               </a>
             </div>
           )}
         </div>
+
       </div>
     </div>
   );
