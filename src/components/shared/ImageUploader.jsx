@@ -32,7 +32,9 @@ export default function ImageUploader({ onUploadSuccess, label = "Upload Image" 
     try {
       const url = await uploadGitHubImage(file);
       setSuccess(true);
-      onUploadSuccess(url);
+      if (typeof onUploadSuccess === 'function') {
+        onUploadSuccess(url);
+      }
       setTimeout(() => setSuccess(false), 3000);
     } catch (err) {
       console.error(err);
