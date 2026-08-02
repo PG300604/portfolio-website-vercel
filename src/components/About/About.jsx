@@ -213,6 +213,42 @@ export default function About() {
                   <span>Download Resume</span>
                 </a>
               )}
+
+              {about.linkedin && (
+                <a
+                  href={about.linkedin}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="bg-[var(--card-bg)] text-[var(--text-main)] border border-[var(--border-subtle)] hover:border-[var(--border-strong)] font-bold px-5 sm:px-6 py-3 sm:py-3.5 rounded-full transition-colors inline-flex items-center gap-1.5 shadow-lg"
+                >
+                  <span>LinkedIn</span>
+                  <span>↗</span>
+                </a>
+              )}
+
+              {about.github && (
+                <a
+                  href={about.github}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="bg-[var(--card-bg)] text-[var(--text-main)] border border-[var(--border-subtle)] hover:border-[var(--border-strong)] font-bold px-5 sm:px-6 py-3 sm:py-3.5 rounded-full transition-colors inline-flex items-center gap-1.5 shadow-lg"
+                >
+                  <span>GitHub</span>
+                  <span>↗</span>
+                </a>
+              )}
+
+              {about.instagram && (
+                <a
+                  href={about.instagram}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="bg-[var(--card-bg)] text-[var(--text-main)] border border-[var(--border-subtle)] hover:border-[var(--border-strong)] font-bold px-5 sm:px-6 py-3 sm:py-3.5 rounded-full transition-colors inline-flex items-center gap-1.5 shadow-lg"
+                >
+                  <span>Instagram</span>
+                  <span>↗</span>
+                </a>
+              )}
             </div>
 
           </div>

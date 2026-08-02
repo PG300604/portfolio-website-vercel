@@ -173,24 +173,18 @@ export default function AboutAdmin() {
             />
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <div>
-              <label className="block text-[11px] text-[var(--text-muted)] uppercase tracking-wider mb-2">LinkedIn Profile URL</label>
-              <input 
-                name="linkedin" 
-                value={about.linkedin || ''} 
-                onChange={handleChange} 
-                className="w-full bg-[var(--bg-main)] text-[var(--text-main)] border border-[var(--border-subtle)] focus:border-[var(--text-main)] rounded-xl px-4 py-2.5 text-xs outline-none transition-colors" 
-              />
+              <label className="block font-mono text-[11px] text-[#8fa3c0] uppercase tracking-widest mb-2">LinkedIn URL</label>
+              <input name="linkedin" value={about.linkedin || ''} onChange={handleChange} className="w-full bg-[var(--bg-main)] text-[var(--text-main)] border border-[var(--border-subtle)] focus:border-[var(--text-main)] rounded-xl p-3 font-mono text-sm focus:outline-none" />
             </div>
             <div>
-              <label className="block text-[11px] text-[var(--text-muted)] uppercase tracking-wider mb-2">GitHub Profile URL</label>
-              <input 
-                name="github" 
-                value={about.github || ''} 
-                onChange={handleChange} 
-                className="w-full bg-[var(--bg-main)] text-[var(--text-main)] border border-[var(--border-subtle)] focus:border-[var(--text-main)] rounded-xl px-4 py-2.5 text-xs outline-none transition-colors" 
-              />
+              <label className="block font-mono text-[11px] text-[#8fa3c0] uppercase tracking-widest mb-2">GitHub URL</label>
+              <input name="github" value={about.github || ''} onChange={handleChange} className="w-full bg-[var(--bg-main)] text-[var(--text-main)] border border-[var(--border-subtle)] focus:border-[var(--text-main)] rounded-xl p-3 font-mono text-sm focus:outline-none" />
+            </div>
+            <div>
+              <label className="block font-mono text-[11px] text-[#8fa3c0] uppercase tracking-widest mb-2">Instagram URL</label>
+              <input name="instagram" value={about.instagram || ''} onChange={handleChange} placeholder="e.g. https://instagram.com/priyanshughosh__" className="w-full bg-[var(--bg-main)] text-[var(--text-main)] border border-[var(--border-subtle)] focus:border-[var(--text-main)] rounded-xl p-3 font-mono text-sm focus:outline-none" />
             </div>
           </div>
 
