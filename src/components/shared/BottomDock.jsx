@@ -72,15 +72,15 @@ export default function BottomDock({ activeSection, viewMode, setViewMode, theme
             <span>Gallery</span>
           </button>
           <button
-            onClick={() => setViewMode('list')}
+            onClick={() => setViewMode('carousel')}
             className={`px-2.5 py-1 rounded-full transition-all flex items-center gap-1 ${
-              viewMode === 'list'
+              viewMode === 'carousel'
                 ? 'bg-[var(--text-main)] text-[var(--bg-main)] font-bold'
                 : 'hover:text-[var(--text-main)]'
             }`}
           >
-            <span>[{viewMode === 'list' ? '·' : ' '}]</span>
-            <span>List</span>
+            <span>[{viewMode === 'carousel' ? '·' : ' '}]</span>
+            <span>Carousel</span>
           </button>
         </div>
 

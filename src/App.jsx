@@ -39,7 +39,7 @@ import GradualBlur from './components/ReactBits/GradualBlur';
 
 function PublicLayout() {
   const [theme, setTheme] = useState('dark'); // 'dark' | 'cream'
-  const [viewMode, setViewMode] = useState('list'); // 'list' | 'gallery'
+  const [viewMode, setViewMode] = useState('carousel'); // 'carousel' | 'gallery'
   const [activeSection, setActiveSection] = useState('projects');
 
   useEffect(() => {

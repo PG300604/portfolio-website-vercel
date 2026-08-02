@@ -3,33 +3,14 @@ import { AnimatePresence } from 'framer-motion';
 import { useGitHubData } from '../../hooks/useGitHubData';
 import ProjectModal from './ProjectModal';
 import ScrollFloat from '../ReactBits/ScrollFloat';
-import FlyingPosters from '../ReactBits/FlyingPosters';
 import InfiniteMenu from '../ReactBits/InfiniteMenu';
-import { ChevronUp, ChevronDown, MoveVertical, Sparkles } from 'lucide-react';
+import Carousel from '../ReactBits/Carousel';
+import { Sparkles, MoveHorizontal } from 'lucide-react';
 
-function useResponsiveDimensions(mobileW, mobileH, desktopW, desktopH, breakpoint = 640) {
-  const [dims, setDims] = useState(() => {
-    const w = typeof window !== 'undefined' ? window.innerWidth : 1024;
-    return w < breakpoint ? { w: mobileW, h: mobileH } : { w: desktopW, h: desktopH };
-  });
-
-  useEffect(() => {
-    const handleResize = () => {
-      setDims(window.innerWidth < breakpoint ? { w: mobileW, h: mobileH } : { w: desktopW, h: desktopH });
-    };
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
-  }, [mobileW, mobileH, desktopW, desktopH, breakpoint]);
-
-  return dims;
-}
-
-export default function Projects({ viewMode = 'list' }) {
+export default function Projects({ viewMode = 'carousel' }) {
   const { data: projectsData } = useGitHubData('projects.json');
   const { data: visibility } = useGitHubData('visibility.json');
   const [selectedProject, setSelectedProject] = useState(null);
-  const postersRef = useRef(null);
-  const posterDims = useResponsiveDimensions(320, 260, 620, 420);
 
   if (visibility && !visibility.projects) return null;
 
@@ -78,11 +59,14 @@ export default function Projects({ viewMode = 'list' }) {
   const projects = projectsData || defaultProjects;
   const visibleProjects = projects.filter(p => p.visible !== false);
 
-  // Strictly map project artwork images (filter out profile photos)
-  const posterItems = visibleProjects.map(p => {
-    if (p.image && !p.image.includes('profile')) return p.image;
-    return "/Homepage.png";
-  });
+  const carouselItems = visibleProjects.map((p, idx) => ({
+    id: p.id || idx,
+    title: p.title,
+    category: p.category || 'FEATURED WORK',
+    description: p.description,
+    image: p.image || p.imageUrl || '/Homepage.png',
+    originalProject: p
+  }));
 
   const infiniteMenuItems = visibleProjects.map(p => ({
     image: p.imageUrl || p.image || '/Homepage.png',
@@ -90,12 +74,6 @@ export default function Projects({ viewMode = 'list' }) {
     title: p.title,
     description: ''
   }));
-
-  const handlePosterClick = (index) => {
-    if (visibleProjects[index]) {
-      setSelectedProject(visibleProjects[index]);
-    }
-  };
 
   const handleInfiniteSelect = (item) => {
     const proj = visibleProjects.find(p => p.title === item.title);
@@ -130,60 +108,40 @@ export default function Projects({ viewMode = 'list' }) {
             <InfiniteMenu items={infiniteMenuItems} scale={1.1} onSelect={handleInfiniteSelect} />
           </div>
         ) : (
-          /* LIST MODE (DEFAULT): 3D FLYING POSTERS STAGE */
-          <div className="relative w-full overflow-hidden rounded-2xl sm:rounded-3xl group">
+          /* CAROUSEL MODE (DEFAULT): React Bits 3D 360° Carousel Stage */
+          <div className="relative w-full overflow-hidden rounded-2xl sm:rounded-3xl bg-[var(--card-bg)]/40 border border-[var(--border-subtle)] p-4 sm:p-8 backdrop-blur-md shadow-2xl space-y-6">
             
-            {/* Top Floating Instruction Badge */}
-            <div className="absolute top-3 sm:top-4 left-3 sm:left-4 z-20 font-mono-custom text-[10px] sm:text-xs text-[var(--text-main)] uppercase tracking-widest bg-[var(--bg-main)]/90 backdrop-blur-md px-3 sm:px-4 py-1.5 sm:py-2 rounded-full border border-[var(--border-subtle)] shadow-2xl flex items-center gap-2 pointer-events-none">
-              <MoveVertical className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-[var(--accent-glow)] animate-pulse" />
-              <span className="hidden sm:inline">[ DRAG CARDS UP / DOWN TO FLY • CLICK CARD FOR SPECS ]</span>
-              <span className="sm:hidden">[ DRAG / TAP ]</span>
+            {/* Top Instruction Badge */}
+            <div className="flex items-center justify-between font-mono-custom text-[10px] sm:text-xs text-[var(--text-muted)] uppercase tracking-wider pb-3 border-b border-[var(--border-subtle)]">
+              <div className="flex items-center gap-2">
+                <MoveHorizontal className="w-3.5 h-3.5 text-[var(--accent-glow)] animate-pulse" />
+                <span>[ DRAG / SWIPE TO ROTATE 360° • TAP CARD FOR FULL SPECS ]</span>
+              </div>
+              <span className="hidden sm:inline">[ AUTOPLAY ACTIVE ]</span>
             </div>
 
-            {/* Right Floating Navigation */}
-            <div className="absolute right-2 sm:right-4 top-1/2 -translate-y-1/2 z-20 flex flex-col gap-2 sm:gap-3">
-              <button
-                onClick={() => postersRef.current?.prev()}
-                className="p-2 sm:p-3 rounded-full bg-[var(--bg-main)]/90 backdrop-blur-md border border-[var(--border-subtle)] hover:border-[var(--border-strong)] text-[var(--text-main)] transition-colors shadow-2xl flex items-center justify-center"
-                title="Fly to Previous Project Card"
-              >
-                <ChevronUp className="w-4 h-4 sm:w-5 sm:h-5" />
-              </button>
-              <button
-                onClick={() => postersRef.current?.next()}
-                className="p-2 sm:p-3 rounded-full bg-[var(--bg-main)]/90 backdrop-blur-md border border-[var(--border-subtle)] hover:border-[var(--border-strong)] text-[var(--text-main)] transition-colors shadow-2xl flex items-center justify-center"
-                title="Fly to Next Project Card"
-              >
-                <ChevronDown className="w-4 h-4 sm:w-5 sm:h-5" />
-              </button>
-            </div>
+            {/* React Bits 3D Carousel Component */}
+            <Carousel
+              items={carouselItems}
+              baseWidth={340}
+              autoplay={true}
+              autoplayDelay={3500}
+              pauseOnHover={true}
+              loop={true}
+              round={false}
+              onItemClick={(item) => setSelectedProject(item.originalProject || item)}
+            />
 
-            {/* 3D WebGL Canvas Stage */}
-            <div 
-              data-cursor="[ DRAG TO FLY / CLICK ]"
-              className="h-[440px] sm:h-[600px] md:h-[760px] w-full relative cursor-grab active:cursor-grabbing"
-            >
-              <FlyingPosters
-                ref={postersRef}
-                items={posterItems}
-                planeWidth={posterDims.w}
-                planeHeight={posterDims.h}
-                distortion={4}
-                scrollEase={0.06}
-                onItemClick={handlePosterClick}
-              />
-            </div>
-
-            {/* Bottom Quick Select Pill Buttons */}
-            <div className="absolute bottom-3 sm:bottom-4 left-1/2 -translate-x-1/2 z-20 flex flex-wrap justify-center items-center gap-1.5 sm:gap-2 max-w-full px-3 sm:px-4">
+            {/* Quick Select Pill Buttons */}
+            <div className="flex flex-wrap justify-center items-center gap-1.5 sm:gap-2 max-w-full px-3 sm:px-4 pt-4 border-t border-[var(--border-subtle)]">
               {visibleProjects.map((project, idx) => (
                 <button
                   key={project.id || idx}
                   onClick={() => setSelectedProject(project)}
-                  className="font-mono-custom text-[10px] sm:text-xs text-[var(--text-main)] bg-[var(--bg-main)]/90 backdrop-blur-md border border-[var(--border-subtle)] hover:border-[var(--border-strong)] px-2.5 sm:px-4 py-1.5 sm:py-2 rounded-full shadow-xl transition-all flex items-center gap-1.5 sm:gap-2 hover:scale-105"
+                  className="font-mono-custom text-[10px] sm:text-xs text-[var(--text-main)] bg-[var(--bg-main)] border border-[var(--border-subtle)] hover:border-[var(--border-strong)] px-3 sm:px-4 py-1.5 rounded-full shadow-md transition-all flex items-center gap-1.5 sm:gap-2 hover:scale-105 cursor-pointer"
                 >
                   <Sparkles className="w-2.5 h-2.5 sm:w-3 sm:h-3 text-[var(--accent-glow)]" />
-                  <span className="truncate max-w-[100px] sm:max-w-none">0{idx + 1} / {project.title}</span>
+                  <span className="truncate max-w-[120px] sm:max-w-none">0{idx + 1} / {project.title}</span>
                 </button>
               ))}
             </div>
