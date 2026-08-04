@@ -1,0 +1,7 @@
+[
+  { "id": "java", "name": "Java SE 17 & Spring Boot", "category": "Backend Architecture" },
+  { "id": "react", "name": "React 19 & Next.js", "category": "Interface Systems" },
+  { "id": "websockets", "name": "WebSockets & Microservices", "category": "Realtime Systems" },
+  { "id": "docker", "name": "Docker & PostgreSQL", "category": "Infrastructure" },
+  { "id": "tailwind", "name": "TailwindCSS & Framer Motion", "category": "Design & Motion" }
+]

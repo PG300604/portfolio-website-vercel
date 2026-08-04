@@ -1,0 +1,8 @@
+{
+  "profiles": [
+    { "id": "tech", "label": "Tech & Software", "instagram": "https://instagram.com/" }
+  ],
+  "items": [
+    { "id": "m1", "url": "/Homepage.png", "caption": "Portfolio Interface Systems", "categoryId": "tech" }
+  ]
+}

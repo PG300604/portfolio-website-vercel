@@ -4,6 +4,7 @@ export async function writeGitHubData(filename, newData) {
   const token = import.meta.env.VITE_GH_TOKEN;
   const owner = import.meta.env.VITE_GH_OWNER;
   const repo = import.meta.env.VITE_GH_REPO;
+  const branch = import.meta.env.VITE_GH_BRANCH || 'main';
   
   if (!token || !owner || !repo) {
     throw new Error('GitHub configuration missing in .env');
@@ -17,21 +18,23 @@ export async function writeGitHubData(filename, newData) {
     try {
       // Step 1: Get current SHA
       const getRes = await axios.get(url, {
-        headers: { Authorization: `Bearer ${token}` }
+        headers: { Authorization: `Bearer ${token}` },
+        params: { ref: branch }
       });
       currentSha = getRes.data.sha;
     } catch (err) {
       if (err.response && err.response.status === 404) {
-        // File does not exist, that's fine, we create it without sha
+        // File does not exist, created without sha
       } else {
         throw err;
       }
     }
 
-    // Step 2: PUT updated content
+    // Step 2: PUT updated content to specified branch
     const payload = {
       message: `update: ${filename}`,
-      content: btoa(unescape(encodeURIComponent(JSON.stringify(newData, null, 2))))
+      content: btoa(unescape(encodeURIComponent(JSON.stringify(newData, null, 2)))),
+      branch: branch
     };
     
     if (currentSha) {

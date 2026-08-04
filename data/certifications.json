@@ -1,0 +1,20 @@
+[
+  {
+    "id": "c1",
+    "name": "Java SE 17 Developer Certification",
+    "org": "Oracle",
+    "issuedBy": "Oracle University",
+    "date": "2025",
+    "featured": true,
+    "credentialId": "ORC-8930211"
+  },
+  {
+    "id": "c2",
+    "name": "Spring Certified Professional",
+    "org": "VMware Tanzu",
+    "issuedBy": "VMware",
+    "date": "2025",
+    "featured": false,
+    "credentialId": "VMW-554201"
+  }
+]

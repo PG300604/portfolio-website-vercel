@@ -1,0 +1,41 @@
+[
+  {
+    "id": "p1",
+    "title": "CryptOwl Intelligence",
+    "category": "SaaS & WebSockets",
+    "year": "2026",
+    "description": "Realtime market telemetry SaaS platform with live analytics, AI signals, and automated user alerts.",
+    "stack": ["Java", "Spring Boot", "React", "WebSockets"],
+    "featured": true,
+    "visible": true,
+    "image": "/Homepage.png",
+    "liveUrl": "https://cryptowl.io/",
+    "githubUrl": "https://github.com/PG300604"
+  },
+  {
+    "id": "p2",
+    "title": "Distributed Job Engine",
+    "category": "Backend Architecture",
+    "year": "2025",
+    "description": "High-throughput asynchronous background job execution pipeline built with Java concurrency.",
+    "stack": ["Java", "Docker", "REST API", "PostgreSQL"],
+    "featured": false,
+    "visible": true,
+    "image": "/Homepage.png",
+    "liveUrl": "#",
+    "githubUrl": "https://github.com/PG300604"
+  },
+  {
+    "id": "p3",
+    "title": "Specia1ne Portfolio System",
+    "category": "Interface System",
+    "year": "2026",
+    "description": "Editorial digital practice portfolio shaped with custom motion physics and responsive layouts.",
+    "stack": ["React", "Shadcn UI", "Anime.js", "TailwindCSS"],
+    "featured": true,
+    "visible": true,
+    "image": "/Homepage.png",
+    "liveUrl": "#",
+    "githubUrl": "https://github.com/PG300604"
+  }
+]

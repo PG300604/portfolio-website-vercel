@@ -1,0 +1,11 @@
+{
+  "hero": true,
+  "about": true,
+  "stack": true,
+  "projects": true,
+  "certifications": true,
+  "timeline": true,
+  "media": true,
+  "blogs": true,
+  "contact": true
+}
