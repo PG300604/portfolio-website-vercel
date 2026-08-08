@@ -1,17 +1,15 @@
 import { useState } from 'react';
 import { useGitHubData } from '../../hooks/useGitHubData';
-import { useTilt } from '../../hooks/useTilt';
 import { Dialog, DialogContent, DialogTrigger, DialogTitle, DialogDescription } from '../ui/dialog';
-import { User, Download, Award, GraduationCap, BarChart3, Code2 } from 'lucide-react';
+import { User, Download, Award, GraduationCap, BarChart3, Code2, MoveHorizontal } from 'lucide-react';
 import ScrollFloat from '../ReactBits/ScrollFloat';
+import Lanyard from '../ReactBits/Lanyard';
 
 export default function About() {
   const { data: aboutData } = useGitHubData('about.json');
   const { data: visibility } = useGitHubData('visibility.json');
   const [photoOpen, setPhotoOpen] = useState(false);
   const [activeTab, setActiveTab] = useState('bio');
-
-  const tilt = useTilt({ max: 8, scale: 1.02 });
 
   if (visibility && !visibility.about) return null;
 
@@ -51,59 +49,60 @@ export default function About() {
 
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 sm:gap-12 items-start mt-4 sm:mt-8">
           
-          {/* LEFT: Photo Frame */}
-          <div className="lg:col-span-5 flex flex-col items-center">
-            <Dialog open={photoOpen} onOpenChange={setPhotoOpen}>
-              <DialogTrigger asChild>
-                <div
-                  ref={tilt.ref}
-                  onMouseMove={tilt.onMouseMove}
-                  onMouseLeave={tilt.onMouseLeave}
-                  data-cursor="[ EXPAND PHOTO ]"
-                  className="relative group cursor-pointer w-full max-w-[260px] sm:max-w-sm rounded-2xl p-2 sm:p-3 bg-[var(--card-bg)] border border-[var(--border-subtle)] hover:border-[var(--border-strong)] transition-all shadow-2xl"
-                >
-                  <div className="aspect-4/5 rounded-xl overflow-hidden relative bg-[var(--bg-main)] flex items-center justify-center border border-[var(--border-subtle)]">
+          {/* LEFT: 3D Physics Lanyard Card Stage */}
+          <div className="lg:col-span-5 flex flex-col items-center w-full">
+            <div className="relative w-full max-w-sm sm:max-w-md h-[460px] sm:h-[540px] rounded-3xl bg-[var(--card-bg)]/80 border border-[var(--border-subtle)] overflow-hidden shadow-2xl flex flex-col items-center justify-between p-4 group">
+              
+              {/* Badge Overlay */}
+              <div className="absolute top-4 left-4 z-10 font-mono-custom text-[10px] sm:text-xs text-[var(--text-main)] uppercase tracking-wider bg-[var(--bg-main)]/90 backdrop-blur-md px-3.5 py-1.5 rounded-full border border-[var(--border-subtle)] shadow-lg flex items-center gap-2 pointer-events-none">
+                <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+                <span>[ 3D LANYARD BADGE • DRAG CARD ]</span>
+              </div>
+
+              {/* React Bits 3D Lanyard Component */}
+              <div className="w-full h-full cursor-grab active:cursor-grabbing">
+                <Lanyard
+                  position={[0, 0, 20]}
+                  gravity={[0, -40, 0]}
+                  frontImage={photoSrc}
+                  backImage={photoSrc}
+                  imageFit="cover"
+                  lanyardWidth={1.2}
+                />
+              </div>
+
+              {/* Bottom Expand Trigger Button */}
+              <Dialog open={photoOpen} onOpenChange={setPhotoOpen}>
+                <DialogTrigger asChild>
+                  <button 
+                    data-cursor="[ EXPAND PORTRAIT ]"
+                    className="z-10 font-mono-custom text-[10px] sm:text-xs text-[var(--text-muted)] hover:text-[var(--text-main)] uppercase bg-[var(--bg-main)]/90 backdrop-blur-md px-4 py-2 rounded-full border border-[var(--border-subtle)] hover:border-[var(--border-strong)] transition-all cursor-pointer shadow-md mb-1"
+                  >
+                    [ CLICK TO VIEW HIGH-RES PORTRAIT ↗ ]
+                  </button>
+                </DialogTrigger>
+
+                <DialogContent className="max-w-[90vw] sm:max-w-xl bg-[var(--bg-main)] border-[var(--border-subtle)] text-[var(--text-main)] p-4 sm:p-6 rounded-2xl sm:rounded-3xl shadow-2xl">
+                  <DialogTitle className="font-mono-custom text-[10px] sm:text-xs uppercase tracking-wider text-[var(--text-muted)]">
+                    [ PRIYANSHU GHOSH • PORTRAIT PREVIEW ]
+                  </DialogTitle>
+                  <DialogDescription className="hidden">Profile Photo</DialogDescription>
+                  <div className="mt-3 sm:mt-4 rounded-xl sm:rounded-2xl overflow-hidden border border-[var(--border-subtle)] max-h-[70vh] flex items-center justify-center bg-[var(--card-bg)]">
                     <img
                       src={photoSrc}
-                      alt="Priyanshu Profile"
-                      className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                      alt="Priyanshu High Res"
+                      className="w-full h-full object-contain"
                       onError={(e) => {
                         if (e.target.src.endsWith('/profile.png')) {
                           e.target.src = '/profile.jpg';
-                        } else if (e.target.src.endsWith('/profile.jpg')) {
-                          e.target.src = '/Homepage.png';
                         }
                       }}
                     />
                   </div>
+                </DialogContent>
+              </Dialog>
 
-                  <div className="flex justify-between items-center mt-2 sm:mt-3 font-mono-custom text-[10px] sm:text-xs text-[var(--text-muted)]">
-                    <span>PORTRAIT</span>
-                    <span className="text-[var(--text-main)] font-bold hidden sm:inline">[ 3D TILT • CLICK TO EXPAND ]</span>
-                    <span className="text-[var(--text-main)] font-bold sm:hidden">[ TAP ]</span>
-                  </div>
-                </div>
-              </DialogTrigger>
-
-              <DialogContent className="max-w-[90vw] sm:max-w-xl bg-[var(--bg-main)] border-[var(--border-subtle)] text-[var(--text-main)] p-4 sm:p-6 rounded-2xl sm:rounded-3xl shadow-2xl">
-                <DialogTitle className="font-mono-custom text-[10px] sm:text-xs uppercase tracking-wider text-[var(--text-muted)]">
-                  [ PRIYANSHU GHOSH • PORTRAIT PREVIEW ]
-                </DialogTitle>
-                <DialogDescription className="hidden">Profile Photo</DialogDescription>
-                <div className="mt-3 sm:mt-4 rounded-xl sm:rounded-2xl overflow-hidden border border-[var(--border-subtle)] max-h-[70vh] flex items-center justify-center bg-[var(--card-bg)]">
-                  <img
-                    src={photoSrc}
-                    alt="Priyanshu High Res"
-                    className="w-full h-full object-contain"
-                    onError={(e) => {
-                      if (e.target.src.endsWith('/profile.png')) {
-                        e.target.src = '/profile.jpg';
-                      }
-                    }}
-                  />
-                </div>
-              </DialogContent>
-            </Dialog>
+            </div>
           </div>
 
           {/* RIGHT: Tabbed Specifications */}
@@ -119,7 +118,7 @@ export default function About() {
                 <button
                   key={tab.id}
                   onClick={() => setActiveTab(tab.id)}
-                  className={`px-3 sm:px-5 py-2 sm:py-2.5 rounded-full border transition-all flex items-center gap-1.5 sm:gap-2 whitespace-nowrap shrink-0 ${
+                  className={`px-3 sm:px-5 py-2 sm:py-2.5 rounded-full border transition-all flex items-center gap-1.5 sm:gap-2 whitespace-nowrap shrink-0 cursor-pointer ${
                     activeTab === tab.id
                       ? 'bg-[var(--text-main)] text-[var(--bg-main)] font-bold border-[var(--text-main)] shadow-lg'
                       : 'bg-[var(--card-bg)] text-[var(--text-muted)] border-[var(--border-subtle)] hover:text-[var(--text-main)]'
@@ -131,69 +130,43 @@ export default function About() {
               ))}
             </div>
 
-            {/* TAB: BIO */}
+            {/* Tab Panels */}
             {activeTab === 'bio' && (
-              <div className="bg-[var(--card-bg)] border border-[var(--border-subtle)] rounded-2xl sm:rounded-3xl p-5 sm:p-8 space-y-4 sm:space-y-6 shadow-xl">
-                <div className="flex items-center justify-between border-b border-[var(--border-subtle)] pb-3 sm:pb-4 font-mono-custom text-[10px] sm:text-xs text-[var(--text-muted)] uppercase">
-                  <span>// BIOGRAPHY & PRACTICE</span>
-                  <span className="hidden sm:inline">STATUS: ACTIVE DEVELOPER</span>
-                </div>
-                <p className="text-[var(--text-main)] font-sora text-lg sm:text-xl font-bold leading-relaxed">
-                  Full-Stack Java & Web Systems Engineer
-                </p>
-                <p className="text-[var(--text-muted)] font-mono-custom text-[11px] sm:text-sm leading-relaxed">
+              <div className="space-y-4 sm:space-y-6 animate-fadeIn">
+                <p className="font-sora text-base sm:text-lg text-[var(--text-main)] leading-relaxed font-medium">
                   {about.bio}
                 </p>
-                <div className="pt-3 sm:pt-4 flex flex-wrap gap-2 sm:gap-2.5 font-mono-custom text-[10px] sm:text-xs">
-                  <span className="px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-lg bg-[var(--bg-main)] border border-[var(--border-subtle)] text-[var(--text-main)]">
-                    JAVA 21 / SPRING BOOT 3
-                  </span>
-                  <span className="px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-lg bg-[var(--bg-main)] border border-[var(--border-subtle)] text-[var(--text-main)]">
-                    REACT 19 / NEXT.JS
-                  </span>
-                  <span className="px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-lg bg-[var(--bg-main)] border border-[var(--border-subtle)] text-[var(--text-main)]">
-                    POSTGRESQL & REDIS
-                  </span>
+                <div className="font-mono-custom text-xs text-[var(--text-muted)] space-y-2 border-l-2 border-[var(--accent-glow)] pl-4 py-1">
+                  <div>// CURRENT FOCUS: Java Spring Boot Microservices & React Architecture</div>
+                  <div>// LOCATION: {about.location}</div>
+                  <div>// ROLES: {about.heroRoles || "Full Stack Developer"}</div>
                 </div>
               </div>
             )}
 
-            {/* TAB: ACADEMICS */}
             {activeTab === 'academics' && (
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
-                <div className="bg-[var(--card-bg)] border border-[var(--border-subtle)] p-5 sm:p-6 rounded-xl sm:rounded-2xl space-y-3 shadow-xl">
-                  <div className="flex items-center justify-between font-mono-custom text-[10px] sm:text-xs text-[var(--text-muted)] uppercase border-b border-[var(--border-subtle)] pb-3">
-                    <span>// DEGREE</span>
-                    <GraduationCap className="w-4 h-4 text-emerald-400" />
-                  </div>
-                  <div className="font-sora text-base sm:text-lg font-extrabold text-[var(--text-main)]">{about.degree}</div>
-                  <div className="font-mono-custom text-[10px] sm:text-xs text-[var(--text-muted)]">{about.college}</div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 font-mono-custom text-xs animate-fadeIn">
+                <div className="bg-[var(--card-bg)] border border-[var(--border-subtle)] p-4 sm:p-6 rounded-xl sm:rounded-2xl space-y-2 shadow-xl">
+                  <span className="text-[var(--text-muted)] uppercase block font-bold">// DEGREE</span>
+                  <h4 className="font-sora text-sm sm:text-base font-bold text-[var(--text-main)]">{about.degree}</h4>
+                  <p className="text-[var(--text-muted)]">{about.college}</p>
                 </div>
-
-                <div className="bg-[var(--card-bg)] border border-[var(--border-subtle)] p-5 sm:p-6 rounded-xl sm:rounded-2xl space-y-3 shadow-xl">
-                  <div className="flex items-center justify-between font-mono-custom text-[10px] sm:text-xs text-[var(--text-muted)] uppercase border-b border-[var(--border-subtle)] pb-3">
-                    <span>// STATUS</span>
-                    <Award className="w-4 h-4 text-sky-400" />
-                  </div>
-                  <div className="font-sora text-base sm:text-lg font-extrabold text-[var(--text-main)]">{about.year}</div>
-                  <div className="font-mono-custom text-[10px] sm:text-xs text-[var(--text-muted)]">{about.location}</div>
+                <div className="bg-[var(--card-bg)] border border-[var(--border-subtle)] p-4 sm:p-6 rounded-xl sm:rounded-2xl space-y-2 shadow-xl">
+                  <span className="text-[var(--text-muted)] uppercase block font-bold">// PERFORMANCE</span>
+                  <h4 className="font-sora text-sm sm:text-base font-bold text-[var(--text-main)]">SGPA: {about.sgpa} / 10.0</h4>
+                  <p className="text-[var(--text-muted)]">{about.year}</p>
                 </div>
               </div>
             )}
 
-            {/* TAB: METRICS */}
             {activeTab === 'metrics' && (
-              <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 sm:gap-6">
+              <div className="grid grid-cols-2 gap-3 sm:gap-4 font-mono-custom animate-fadeIn">
                 <div className="bg-[var(--card-bg)] border border-[var(--border-subtle)] p-4 sm:p-6 rounded-xl sm:rounded-2xl text-center shadow-xl">
-                  <span className="font-mono-custom text-[10px] sm:text-xs text-[var(--text-muted)] uppercase block mb-2">// SGPA</span>
-                  <span className="font-sora text-3xl sm:text-4xl font-extrabold text-[var(--text-main)]">{about.sgpa}</span>
-                </div>
-                <div className="bg-[var(--card-bg)] border border-[var(--border-subtle)] p-4 sm:p-6 rounded-xl sm:rounded-2xl text-center shadow-xl">
-                  <span className="font-mono-custom text-[10px] sm:text-xs text-[var(--text-muted)] uppercase block mb-2">// PROJECTS</span>
+                  <span className="text-[10px] sm:text-xs text-[var(--text-muted)] uppercase block mb-2">// PROJECTS</span>
                   <span className="font-sora text-3xl sm:text-4xl font-extrabold text-[var(--text-main)]">{about.projectsCount}</span>
                 </div>
-                <div className="bg-[var(--card-bg)] border border-[var(--border-subtle)] p-4 sm:p-6 rounded-xl sm:rounded-2xl text-center col-span-2 sm:col-span-1 shadow-xl">
-                  <span className="font-mono-custom text-[10px] sm:text-xs text-[var(--text-muted)] uppercase block mb-2">// STATUS</span>
+                <div className="bg-[var(--card-bg)] border border-[var(--border-subtle)] p-4 sm:p-6 rounded-xl sm:rounded-2xl text-center shadow-xl">
+                  <span className="text-[10px] sm:text-xs text-[var(--text-muted)] uppercase block mb-2">// STATUS</span>
                   <span className="font-mono-custom text-xs font-bold text-emerald-400 block mt-3">[ 100% ONLINE ]</span>
                 </div>
               </div>
