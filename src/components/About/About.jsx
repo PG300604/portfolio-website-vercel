@@ -51,7 +51,7 @@ export default function About() {
           
           {/* LEFT: 3D Physics Lanyard Card Stage */}
           <div className="lg:col-span-5 flex flex-col items-center w-full">
-            <div className="relative w-full max-w-sm sm:max-w-md h-[460px] sm:h-[540px] rounded-3xl bg-[var(--card-bg)]/80 border border-[var(--border-subtle)] overflow-hidden shadow-2xl flex flex-col items-center justify-between p-4 group">
+            <div className="relative w-full max-w-md sm:max-w-xl h-[520px] sm:h-[640px] rounded-3xl bg-[var(--card-bg)]/80 border border-[var(--border-subtle)] overflow-hidden shadow-2xl flex flex-col items-center justify-between p-4 group">
               
               {/* Badge Overlay */}
               <div className="absolute top-4 left-4 z-10 font-mono-custom text-[10px] sm:text-xs text-[var(--text-main)] uppercase tracking-wider bg-[var(--bg-main)]/90 backdrop-blur-md px-3.5 py-1.5 rounded-full border border-[var(--border-subtle)] shadow-lg flex items-center gap-2 pointer-events-none">
@@ -62,12 +62,13 @@ export default function About() {
               {/* React Bits 3D Lanyard Component */}
               <div className="w-full h-full cursor-grab active:cursor-grabbing">
                 <Lanyard
-                  position={[0, 0, 20]}
+                  position={[0, 0, 14]}
                   gravity={[0, -40, 0]}
                   frontImage={photoSrc}
                   backImage={photoSrc}
                   imageFit="cover"
-                  lanyardWidth={1.2}
+                  lanyardWidth={1.4}
+                  cardScale={3.5}
                 />
               </div>
 

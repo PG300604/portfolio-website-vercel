@@ -61,7 +61,7 @@ export default function Lanyard(props) {
 }
 
 function LanyardCanvas({
-  position = [0, 0, 30],
+  position = [0, 0, 15],
   gravity = [0, -40, 0],
   fov = 20,
   transparent = true,
@@ -69,7 +69,8 @@ function LanyardCanvas({
   backImage = null,
   imageFit = 'cover',
   lanyardImage = null,
-  lanyardWidth = 1
+  lanyardWidth = 1.2,
+  cardScale = 3.2
 }) {
   const [isMobile, setIsMobile] = useState(() => typeof window !== 'undefined' && window.innerWidth < 768);
 
@@ -97,6 +98,7 @@ function LanyardCanvas({
               imageFit={imageFit}
               lanyardImage={lanyardImage}
               lanyardWidth={lanyardWidth}
+              cardScale={cardScale}
             />
           </Physics>
         </Suspense>
@@ -143,7 +145,8 @@ function Band({
   backImage = null,
   imageFit = 'cover',
   lanyardImage = null,
-  lanyardWidth = 1
+  lanyardWidth = 1.2,
+  cardScale = 3.2
 }) {
   const band = useRef(),
     fixed = useRef(),
@@ -277,7 +280,7 @@ function Band({
         <RigidBody position={[2, 0, 0]} ref={card} {...segmentProps} type={dragged ? 'kinematicPosition' : 'dynamic'}>
           <CuboidCollider args={[0.8, 1.125, 0.01]} />
           <group
-            scale={2.25}
+            scale={cardScale}
             position={[0, -1.2, -0.05]}
             onPointerOver={() => hover(true)}
             onPointerOut={() => hover(false)}
