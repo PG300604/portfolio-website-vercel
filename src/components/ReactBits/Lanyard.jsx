@@ -319,7 +319,7 @@ function Band({
   // Synchronize joint anchor and collider precisely with cardScale so the ribbon ALWAYS pins to the hook hole
   const baseScale = 2.25;
   const scaleRatio = cardScale / baseScale;
-  const jointY = 1.45 * scaleRatio;
+  const jointY = 1.28 * scaleRatio;
   const groupY = -1.2 * scaleRatio;
   const colliderHalfWidth = 0.8 * scaleRatio;
   const colliderHalfHeight = 1.125 * scaleRatio;
@@ -391,7 +391,7 @@ function Band({
           <CuboidCollider args={[colliderHalfWidth, colliderHalfHeight, 0.01]} />
           <group
             scale={cardScale}
-            position={[0, groupY, -0.05]}
+            position={[0, groupY, 0]}
             onPointerOver={() => hover(true)}
             onPointerOut={() => hover(false)}
             onPointerUp={e => (e.target.releasePointerCapture(e.pointerId), drag(false))}
