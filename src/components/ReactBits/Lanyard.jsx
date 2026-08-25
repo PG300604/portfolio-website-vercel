@@ -70,7 +70,7 @@ function LanyardCanvas({
   imageFit = 'cover',
   lanyardImage = null,
   logoImage = '/logo.png',
-  lanyardWidth = 0.55,
+  lanyardWidth = 0.88,
   cardScale = 2.25
 }) {
   const [isMobile, setIsMobile] = useState(() => typeof window !== 'undefined' && window.innerWidth < 768);
@@ -148,7 +148,7 @@ function Band({
   imageFit = 'cover',
   lanyardImage = null,
   logoImage = '/logo.png',
-  lanyardWidth = 0.55,
+  lanyardWidth = 0.88,
   cardScale = 2.25
 }) {
   const band = useRef(),
@@ -221,8 +221,8 @@ function Band({
 
       // Draw Site Logo if loaded
       if (logoImg && logoImg.width > 0) {
-        const maxLogoW = 240;
-        const maxLogoH = 140;
+        const maxLogoW = 340;
+        const maxLogoH = 180;
         const scale = Math.min(maxLogoW / logoImg.width, maxLogoH / logoImg.height);
         const dw = logoImg.width * scale;
         const dh = logoImg.height * scale;
@@ -230,29 +230,33 @@ function Band({
         const dy = (H - dh) / 2;
 
         ctx.save();
-        ctx.shadowColor = 'rgba(56, 189, 248, 0.4)';
-        ctx.shadowBlur = 8;
+        ctx.shadowColor = '#38bdf8';
+        ctx.shadowBlur = 12;
+        // Apply brightness filter so logo is crisp white/cyan on dark ribbon
+        ctx.filter = 'brightness(0) invert(1)';
         ctx.drawImage(logoImg, dx, dy, dw, dh);
         ctx.restore();
       } else {
         // Fallback typography
         ctx.save();
         ctx.fillStyle = '#ffffff';
-        ctx.font = 'bold 36px sans-serif';
+        ctx.font = 'bold 42px sans-serif';
         ctx.textAlign = 'center';
         ctx.textBaseline = 'middle';
-        ctx.fillText('PRIYANSHU', segCenterX, H / 2 - 12);
+        ctx.shadowColor = 'rgba(56, 189, 248, 0.6)';
+        ctx.shadowBlur = 10;
+        ctx.fillText('PRIYANSHU', segCenterX, H / 2 - 14);
 
         ctx.fillStyle = '#38bdf8';
-        ctx.font = 'bold 16px monospace';
-        ctx.fillText('[ FULL STACK ]', segCenterX, H / 2 + 24);
+        ctx.font = 'bold 20px monospace';
+        ctx.fillText('[ FULL STACK ]', segCenterX, H / 2 + 26);
         ctx.restore();
       }
 
       // Small separator dot between repeats
       ctx.fillStyle = '#38bdf8';
       ctx.beginPath();
-      ctx.arc(segX + segmentWidth, H / 2, 4, 0, Math.PI * 2);
+      ctx.arc(segX + segmentWidth, H / 2, 5, 0, Math.PI * 2);
       ctx.fill();
     }
 

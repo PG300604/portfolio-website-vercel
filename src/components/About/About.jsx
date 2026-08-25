@@ -67,7 +67,7 @@ export default function About() {
                   frontImage={photoSrc}
                   backImage={photoSrc}
                   imageFit="cover"
-                  lanyardWidth={0.55}
+                  lanyardWidth={0.88}
                   cardScale={2.25}
                   logoImage="/logo.png"
                 />
