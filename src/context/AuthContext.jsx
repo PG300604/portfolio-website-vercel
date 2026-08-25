@@ -16,17 +16,12 @@ export function AuthProvider({ children }) {
   const fetchCredentials = async () => {
     const owner = import.meta.env.VITE_GH_OWNER;
     const repo = import.meta.env.VITE_GH_REPO;
-    const token = import.meta.env.VITE_GH_TOKEN;
+    const branch = import.meta.env.VITE_GH_BRANCH || 'main';
 
-    if (owner && repo && token) {
+    if (owner && repo) {
       try {
-        const res = await fetch(`https://api.github.com/repos/${owner}/${repo}/contents/data/credentials.json`, {
-          headers: {
-            'Authorization': `Bearer ${token}`,
-            'Accept': 'application/vnd.github.v3.raw',
-            'Cache-Control': 'no-cache'
-          }
-        });
+        const timestamp = new Date().getTime();
+        const res = await fetch(`https://raw.githubusercontent.com/${owner}/${repo}/${branch}/data/credentials.json?t=${timestamp}`);
         if (res.ok) {
           const data = await res.json();
           setCredentials(data);
