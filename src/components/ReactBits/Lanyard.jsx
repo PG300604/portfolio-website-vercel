@@ -70,7 +70,7 @@ function LanyardCanvas({
   imageFit = 'cover',
   lanyardImage = null,
   logoImage = '/logo.png',
-  lanyardWidth = 1.2,
+  lanyardWidth = 0.55,
   cardScale = 2.25
 }) {
   const [isMobile, setIsMobile] = useState(() => typeof window !== 'undefined' && window.innerWidth < 768);
@@ -148,7 +148,7 @@ function Band({
   imageFit = 'cover',
   lanyardImage = null,
   logoImage = '/logo.png',
-  lanyardWidth = 1.2,
+  lanyardWidth = 0.55,
   cardScale = 2.25
 }) {
   const band = useRef(),
@@ -319,7 +319,7 @@ function Band({
   // Synchronize joint anchor and collider precisely with cardScale so the ribbon ALWAYS pins to the hook hole
   const baseScale = 2.25;
   const scaleRatio = cardScale / baseScale;
-  const jointY = 1.28 * scaleRatio;
+  const jointY = 1.5 * scaleRatio;
   const groupY = -1.2 * scaleRatio;
   const colliderHalfWidth = 0.8 * scaleRatio;
   const colliderHalfHeight = 1.125 * scaleRatio;
@@ -419,7 +419,7 @@ function Band({
         <meshLineGeometry />
         <meshLineMaterial
           color="white"
-          depthTest={false}
+          depthTest={true}
           resolution={isMobile ? [1000, 2000] : [1000, 1000]}
           useMap
           map={ribbonMap}
