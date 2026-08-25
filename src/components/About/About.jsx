@@ -62,13 +62,14 @@ export default function About() {
               {/* React Bits 3D Lanyard Component */}
               <div className="w-full h-full cursor-grab active:cursor-grabbing">
                 <Lanyard
-                  position={[0, 0, 14]}
+                  position={[0, 0, 10.5]}
                   gravity={[0, -40, 0]}
                   frontImage={photoSrc}
                   backImage={photoSrc}
                   imageFit="cover"
-                  lanyardWidth={1.4}
-                  cardScale={3.5}
+                  lanyardWidth={1.25}
+                  cardScale={2.25}
+                  logoImage="/logo.png"
                 />
               </div>
 

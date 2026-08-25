@@ -61,7 +61,7 @@ export default function Lanyard(props) {
 }
 
 function LanyardCanvas({
-  position = [0, 0, 15],
+  position = [0, 0, 10.5],
   gravity = [0, -40, 0],
   fov = 20,
   transparent = true,
@@ -69,8 +69,9 @@ function LanyardCanvas({
   backImage = null,
   imageFit = 'cover',
   lanyardImage = null,
+  logoImage = '/logo.png',
   lanyardWidth = 1.2,
-  cardScale = 3.2
+  cardScale = 2.25
 }) {
   const [isMobile, setIsMobile] = useState(() => typeof window !== 'undefined' && window.innerWidth < 768);
 
@@ -97,6 +98,7 @@ function LanyardCanvas({
               backImage={backImage}
               imageFit={imageFit}
               lanyardImage={lanyardImage}
+              logoImage={logoImage}
               lanyardWidth={lanyardWidth}
               cardScale={cardScale}
             />
@@ -145,8 +147,9 @@ function Band({
   backImage = null,
   imageFit = 'cover',
   lanyardImage = null,
+  logoImage = '/logo.png',
   lanyardWidth = 1.2,
-  cardScale = 3.2
+  cardScale = 2.25
 }) {
   const band = useRef(),
     fixed = useRef(),
@@ -160,9 +163,106 @@ function Band({
     dir = new THREE.Vector3();
   const segmentProps = { type: 'dynamic', canSleep: true, colliders: false, angularDamping: 4, linearDamping: 4 };
   const { nodes, materials } = useGLTF(cardGLB);
-  const texture = useTexture(lanyardImage || lanyard);
+
+  const logoTexture = useTexture(logoImage || '/logo.png');
   const frontTex = useTexture(frontImage || BLANK_PIXEL);
   const backTex = useTexture(backImage || BLANK_PIXEL);
+  const fallbackTexture = useTexture(lanyardImage || lanyard);
+
+  // Dynamically generate lanyard ribbon texture with site logo
+  const ribbonMap = useMemo(() => {
+    if (lanyardImage) return fallbackTexture;
+
+    const W = 2048;
+    const H = 256;
+    const canvas = document.createElement('canvas');
+    canvas.width = W;
+    canvas.height = H;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return fallbackTexture;
+
+    // 1. Strap Background - Obsidian Dark
+    ctx.fillStyle = '#060a14';
+    ctx.fillRect(0, 0, W, H);
+
+    // 2. Subtle strap fabric weave pattern
+    ctx.fillStyle = 'rgba(255, 255, 255, 0.015)';
+    for (let x = 0; x < W; x += 4) {
+      ctx.fillRect(x, 0, 2, H);
+    }
+
+    // 3. Top & Bottom subtle stitch accent lines
+    ctx.strokeStyle = '#1e2d4a';
+    ctx.lineWidth = 4;
+    ctx.beginPath();
+    ctx.moveTo(0, 6);
+    ctx.lineTo(W, 6);
+    ctx.moveTo(0, H - 6);
+    ctx.lineTo(W, H - 6);
+    ctx.stroke();
+
+    // Subtle glowing cyan accent runners
+    ctx.strokeStyle = 'rgba(56, 189, 248, 0.35)';
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.moveTo(0, 12);
+    ctx.lineTo(W, 12);
+    ctx.moveTo(0, H - 12);
+    ctx.lineTo(W, H - 12);
+    ctx.stroke();
+
+    // 4. Repeated Segments with Site Logo and Brand Styling (4 repeats)
+    const segmentWidth = W / 4;
+    const logoImg = logoTexture?.image;
+
+    for (let i = 0; i < 4; i++) {
+      const segX = i * segmentWidth;
+      const segCenterX = segX + segmentWidth / 2;
+
+      // Draw Site Logo if loaded
+      if (logoImg && logoImg.width > 0) {
+        const maxLogoW = 240;
+        const maxLogoH = 140;
+        const scale = Math.min(maxLogoW / logoImg.width, maxLogoH / logoImg.height);
+        const dw = logoImg.width * scale;
+        const dh = logoImg.height * scale;
+        const dx = segCenterX - dw / 2;
+        const dy = (H - dh) / 2;
+
+        ctx.save();
+        ctx.shadowColor = 'rgba(56, 189, 248, 0.4)';
+        ctx.shadowBlur = 8;
+        ctx.drawImage(logoImg, dx, dy, dw, dh);
+        ctx.restore();
+      } else {
+        // Fallback typography
+        ctx.save();
+        ctx.fillStyle = '#ffffff';
+        ctx.font = 'bold 36px sans-serif';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText('PRIYANSHU', segCenterX, H / 2 - 12);
+
+        ctx.fillStyle = '#38bdf8';
+        ctx.font = 'bold 16px monospace';
+        ctx.fillText('[ FULL STACK ]', segCenterX, H / 2 + 24);
+        ctx.restore();
+      }
+
+      // Small separator dot between repeats
+      ctx.fillStyle = '#38bdf8';
+      ctx.beginPath();
+      ctx.arc(segX + segmentWidth, H / 2, 4, 0, Math.PI * 2);
+      ctx.fill();
+    }
+
+    const dynTexture = new THREE.CanvasTexture(canvas);
+    dynTexture.wrapS = dynTexture.wrapT = THREE.RepeatWrapping;
+    dynTexture.colorSpace = THREE.SRGBColorSpace;
+    dynTexture.anisotropy = 16;
+    dynTexture.needsUpdate = true;
+    return dynTexture;
+  }, [logoTexture, lanyardImage, fallbackTexture]);
 
   const cardMap = useMemo(() => {
     const baseMap = materials.base.map;
@@ -216,12 +316,20 @@ function Band({
   const [dragged, drag] = useState(false);
   const [hovered, hover] = useState(false);
 
+  // Synchronize joint anchor and collider precisely with cardScale so the ribbon ALWAYS pins to the hook hole
+  const baseScale = 2.25;
+  const scaleRatio = cardScale / baseScale;
+  const jointY = 1.45 * scaleRatio;
+  const groupY = -1.2 * scaleRatio;
+  const colliderHalfWidth = 0.8 * scaleRatio;
+  const colliderHalfHeight = 1.125 * scaleRatio;
+
   useRopeJoint(fixed, j1, [[0, 0, 0], [0, 0, 0], 1]);
   useRopeJoint(j1, j2, [[0, 0, 0], [0, 0, 0], 1]);
   useRopeJoint(j2, j3, [[0, 0, 0], [0, 0, 0], 1]);
   useSphericalJoint(j3, card, [
     [0, 0, 0],
-    [0, 1.5, 0]
+    [0, jointY, 0]
   ]);
 
   useEffect(() => {
@@ -262,7 +370,9 @@ function Band({
   });
 
   curve.curveType = 'chordal';
-  texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
+  if (ribbonMap) {
+    ribbonMap.wrapS = ribbonMap.wrapT = THREE.RepeatWrapping;
+  }
 
   return (
     <>
@@ -278,10 +388,10 @@ function Band({
           <BallCollider args={[0.1]} />
         </RigidBody>
         <RigidBody position={[2, 0, 0]} ref={card} {...segmentProps} type={dragged ? 'kinematicPosition' : 'dynamic'}>
-          <CuboidCollider args={[0.8, 1.125, 0.01]} />
+          <CuboidCollider args={[colliderHalfWidth, colliderHalfHeight, 0.01]} />
           <group
             scale={cardScale}
-            position={[0, -1.2, -0.05]}
+            position={[0, groupY, -0.05]}
             onPointerOver={() => hover(true)}
             onPointerOut={() => hover(false)}
             onPointerUp={e => (e.target.releasePointerCapture(e.pointerId), drag(false))}
@@ -312,7 +422,7 @@ function Band({
           depthTest={false}
           resolution={isMobile ? [1000, 2000] : [1000, 1000]}
           useMap
-          map={texture}
+          map={ribbonMap}
           repeat={[-4, 1]}
           lineWidth={lanyardWidth}
         />
